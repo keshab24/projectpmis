@@ -97,7 +97,7 @@ We have 3 types of manpower categories managed from helpers function `manpowerTy
         
 **We must divide manpowers and human resources under these categories dynamically** 
 
-### Manpower
+#### Manpower
 `Manpower CRUD` is already given:
 where different manpowers(positions) like  Project Chief,Deputy Project Chief, etc are registered under these categories
 Datas are there too..
@@ -105,13 +105,13 @@ Datas are there too..
 
 #### Human Resources
 `Human Resources (model=Engineer) CRUD` is also given:
+`Route::resource('engineers', 'Admin\EngineersController');`
+Where people under positions are registered
 
-    ```Route::resource('engineers', 'Admin\EngineersController');
-    Where people under positions are registered```
 
+In `Route::resource('project') -> Admin\ProjectController -> show() -> project/show.blade.php` 
 
-In `Route::resource('project') -> Admin\ProjectController -> show() -> project/show.blade.php `
-
+### Expected Result :
 <img src="docs/images/project_show1.png" />
 <img src="docs/images/project_show2.png" />
 
@@ -142,7 +142,7 @@ Contractor
 Human Resources added here should appear in select list in the same format in 
 **Manpower At Site** of `Route::get('/project/{project}/daily-progress', ['as' => 'daily.progress', 'uses' => 'Admin\DailyProgressController@create']);`
         in `project/daily-progress.blade.php`        
-        
+### Expected Result :     
 <img src="docs/images/daily_progress_manpower.png" /> 
         
         
