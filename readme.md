@@ -27,7 +27,7 @@ We use `Challenge` implementing_office for this challenge with associated root u
         
         
 ### Database and Models:
-ER-Diagrams are in er_diagram/
+ ER-Diagrams are in `docs/er_diagram/`
 
 `ImplementingOffice` has many `Project`
 
@@ -85,8 +85,6 @@ Datas are there too..
 
 In `Route::resource('project') -> Admin\ProjectController -> show() -> project/show.blade.php `
 
-**Form should be in structure | Template is already there**
-
 <img src="docs/images/project_show1.png" />
 <img src="docs/images/project_show2.png" />
 
@@ -117,7 +115,8 @@ Contractor
 Human Resources added here should appear in select list in the same format in 
 **Manpower At Site** of `Route::get('/project/{project}/daily-progress', ['as' => 'daily.progress', 'uses' => 'Admin\DailyProgressController@create']);`
         in `project/daily-progress.blade.php`        
-Template is already there
+        
+<img src="docs/images/daily_progress_manpower.png" /> 
         
         
 ###Problem 2 :: all operations related to dailyprogress should be under SUB-DOMAIN daily-progress.main_url 
@@ -163,7 +162,10 @@ Template is already there
     
 ###Problem 4 :: Display List of HumanResources users who are have not logged into system for at least 2 days. The list should only be visible to users with access 'Root Level'
 1. create a route which directs to a function in `UserController` which shows the users list
-2. add a button on users index_view to view that page    
+2. add a button on users index_view to view that page
+
+
+   
 3. also add it to side menu of partials/_admin_header.blade.php
     
 ###Problem 5 :: Bug Fix
