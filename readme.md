@@ -1,4 +1,40 @@
-## PMIS-Challenge
+## PMIS-Challenge    
+## Table of Contents
+
+- [Getting Started](#getting-started)
+	- [Prerequisites](#Prerequisites)
+	- [Setup](#Setup)
+- [Project Description](#project-description)
+    - [Project Overview](#project-overview)
+    - [Project Structure](#project-structure)
+    - [Database and Models](#database-and-models)
+- [Problems](#problems)
+	- [Problem 1 - Manage Manpower and Human resources for Daily Progess](#problem-1--manage-manpowers-and-human-resources-for-project-and-dailyprogress)
+	- [Problem 2 - Create Subdomain](#problem-2--all-operations-related-to-dailyprogress-should-be-under-sub-domain-daily-progressmain_url)
+	- [Problem 3 - Create Api for materials and tools and equipment used](#problem-3--create-an-api-endpoint-to-calculate-the-total-quantity-of--materials-tools-and-equipment-used-per-week)
+	- [Problem 4 - Display inactive human resources in root user page](#problem-4--display-list-of-humanresources-users-who-are-have-not-logged-into-system-for-at-least-2-days-the-list-should-only-be-visible-to-users-with-access-root-level)
+	- [Problem 5 - Fix a bug in daily progress images](#problem-5--bug-fix)
+	- [Problem 6 - ](#problem-6--rectify-data-at-db-level)
+
+# Getting Started
+## Setup
+### Prerequisites
+* Laravel >5.8
+* PHP >7
+* MySQL Server.
+* Any Preferred Workbench (Sequel Pro, MySQL Workbench) for SQL Databases.
+
+### Local Development:
+1. Clone the Repository: `git clone https://github.com/dolpotech/pmis-challenge.git`.
+2. Run `composer install` to Install Dependencies.
+3. Copy contents of  `.env.example` file to a new file `.env`, If you're on Mac OSX just run: `cp .env.example .env`
+4. Generate an app encryption key: `php artisan key:generate`.
+5. create an empty database for the project.
+6. In the `.env` file, add database information by filling the `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` options to match the credentials of the database you just created.
+7. Migrate the database: `php artisan migrate`.
+
+# Project Description
+
 ### Project Overview
 In PMIS-challenge, ImplementingOffices have many Projects each having its own DailyProgress records. 
 In DailyProgress manpower and human-resources, tools and equipments, materials stock, quantities of work done, weather, images/
@@ -7,17 +43,8 @@ vidoes of progress are recorded.
 We use `Challenge` implementing_office for this challenge with associated root user having:
 - `email`=challenge@gmail.com 
 - `pass`=challenge@321
-    
-###Local Development:
-1. Clone the Repository: `git clone https://github.com/Yamsafer/codeality-laravel.git`.
-2. Run `composer install` to Install Dependencies.
-3. Copy contents of  `.env.example` file to a new file `.env`, If you're on Mac OSX just run: `cp .env.example .env`
-4. Generate an app encryption key: `php artisan key:generate`.
-5. create an empty database for the project.
-6. In the `.env` file, add database information by filling the `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` options to match the credentials of the database you just created.
-7. Migrate the database: `php artisan migrate`.
 
-###Project Structure:
+### Project Structure:
 * Everything is quite similar to default laravel structure
 * Except:
     Controllers are kept in `app\Http\Controllers\Admin` which extends `app\Http\Controllers\AdminBaseController`
@@ -55,7 +82,7 @@ roles and permissions
 
 **When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically 
         
-## Problems
+# Problems
 ### Problem 1 :: Manage Manpowers and Human Resources for project and dailyprogress
 To register manpowers and human_resources(Model=Engineer) in dailyprogress we have to first assign them to its Project.
  
@@ -119,12 +146,12 @@ Human Resources added here should appear in select list in the same format in
 <img src="docs/images/daily_progress_manpower.png" /> 
         
         
-###Problem 2 :: all operations related to dailyprogress should be under SUB-DOMAIN daily-progress.main_url 
+### Problem 2 :: all operations related to dailyprogress should be under SUB-DOMAIN daily-progress.main_url 
      
      if main_url is pmis-challenge.com | DP operations should be daily-progress.pmis-challenge.com/...
 
   
-###Problem 3 :: create an API endpoint to calculate the total quantity of  materials, tools and equipment used per week
+### Problem 3 :: create an API endpoint to calculate the total quantity of  materials, tools and equipment used per week
     
     this api neednot be under DP sub-domain 
     
@@ -160,7 +187,7 @@ Human Resources added here should appear in select list in the same format in
     
     
     
-###Problem 4 :: Display List of HumanResources users who are have not logged into system for at least 2 days. The list should only be visible to users with access 'Root Level'
+### Problem 4 :: Display List of HumanResources users who are have not logged into system for at least 2 days. The list should only be visible to users with access 'Root Level'
 1. create a route which directs to a function in `UserController` which shows the users list
 2. add a button on users index_view to view that page
 
@@ -168,14 +195,14 @@ Human Resources added here should appear in select list in the same format in
    
 3. also add it to side menu of partials/_admin_header.blade.php
     
-###Problem 5 :: Bug Fix
+### Problem 5 :: Bug Fix
     
     one particular image is showing in all DPs 
     
     Should identify the issue and fix it
     
     
-###Problem 6 :: Rectify Data At DB-Level
+### Problem 6 :: Rectify Data At DB-Level
     ..................
 
 
