@@ -97,17 +97,17 @@ We have 3 types of manpower categories managed from helpers function `manpowerTy
         
 **We must divide manpowers and human resources under these categories dynamically** 
 
+### Manpower
 `Manpower CRUD` is already given:
 where different manpowers(positions) like  Project Chief,Deputy Project Chief, etc are registered under these categories
 Datas are there too..
-
 `Route::resource('manpower', 'Admin\ManpowerController');`
 
+#### Human Resources
+`Human Resources (model=Engineer) CRUD` is also given:
 
-`Human Resources (model=`Engineer`) CRUD` is also given:
-
-    Route::resource('engineers', 'Admin\EngineersController');
-    Where people under positions are registered
+    ```Route::resource('engineers', 'Admin\EngineersController');
+    Where people under positions are registered```
 
 
 In `Route::resource('project') -> Admin\ProjectController -> show() -> project/show.blade.php `
