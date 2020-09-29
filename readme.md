@@ -188,11 +188,9 @@ Human Resources added here should appear in select list in the same format in
     
     
 ### Problem 4 :: Display List of HumanResources users who are have not logged into system for at least 2 days. The list should only be visible to users with access 'Root Level'
-1. create a route which directs to a function in `UserController` which shows the users list
-2. add a button on users index_view to view that page
-
-
-   
+1. create a route which directs to a function in `UserController` which shows the users list who are have not logged into system for at least 2 days
+2. add a button on users index_view to top right after search bar to view that page
+<img src="docs/images/user_index.png"/>
 3. also add it to side menu of partials/_admin_header.blade.php
     
 ### Problem 5 :: Bug Fix
