@@ -66,7 +66,7 @@ We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` implementin
 `DailyProgress` stores data in fields manpower, equipments, materials, activities, samples in associative-array form (like json)
 
 `Manpower` & `Engineer`(Human Resource) Models are used to store data in `manpower` field of `DailyProgress`
-Similarly, `Equipment` for equipments, `Material` for materials & samples, `WorkActivity` for activities
+Similarly, `Equipment` for `equipments`, `Material` for `materials` , `WorkActivity` for 'activities'
 
 `created_by` and `updated_by` ForeignKey fields are taken from Authenticated User
 Other fields are stored from input forms 
