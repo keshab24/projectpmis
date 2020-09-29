@@ -40,7 +40,7 @@ In PMIS-challenge, ImplementingOffices have many Projects each having its own Da
 In DailyProgress manpower and human-resources, tools and equipments, materials stock, quantities of work done, weather, images/
 vidoes of progress are recorded.
 
-We use `Challenge` implementing_office for this challenge with associated root user having:
+We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` implementing_office for this challenge with associated root user having:
 - `email`=challenge@gmail.com 
 - `pass`=challenge@321
 
