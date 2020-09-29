@@ -1,0 +1,1755 @@
+<?php
+include_once("connect.php");
+function getRecordSpecO($tbl,$cfield,$cvalue,$ofield,$ord) // for returning informations from particular fields meetin the criterias in order (Approximately matching)
+		{
+			$myquery="SELECT * FROM `$tbl` WHERE ";
+			$count=0;$i=0;
+			foreach($cfield as $cf)
+			{
+				$myquery.="`$cf` LIKE '".mysql_escape_string($cvalue[$count])."%'";
+				$myquery.=$count<(sizeof($cfield)-1)?" and ":"";
+				$count++;
+			}
+			$myquery.=" order by ";
+			$count=0;
+			foreach($ofield as $of)
+			{
+				$myquery.="`$of`";
+				$myquery.=$count<(sizeof($ofield)-1)?" , ":" ";
+				$count++;
+			}
+			$myquery.=$ord;
+			$myResult=mysql_query($myquery);
+			while($data = mysql_fetch_array($myResult))
+			{
+				$mydata[$i++]=$data;
+			}
+			return $mydata;
+		}
+function taxinfo($name)
+{
+$q=mysql_query("select taxable from feecol where title='$name'");
+return mysql_result($q,0,0);
+}
+function idforfeerecord()
+{
+$x=1;
+$query=mysql_query("select max(bill_no) from fee_record");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function idforreceipta()
+{
+$x=1;
+$query=mysql_query("select max(id) from receipt");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function idforreceipt()
+{
+$x=1;
+$query=mysql_query("select max(receipt_no) from receipt");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function idforincomereceipt()
+{
+$x=1;
+$query=mysql_query("select max(receipt_no) from income");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function getmonth($i)
+{
+switch($i)
+{
+case 1:
+return "Baishakh";
+break;
+case 2:
+return "Jestha";
+break;
+case 3:
+return "Ashadh";
+break;
+case 4:
+return "Shrawan";
+break;
+case 5:
+return "Bhadra";
+break;
+case 6:
+return "Ashwin";
+break;
+case 7:
+return "Kartik";
+break;
+case 8:
+return "Mangsir";
+break;
+case 9:
+return "Poush";
+break;
+case 10:
+return "Magh";
+break;
+case 11:
+return "Falgun";
+break;
+case 12:
+return "Chaitra";
+break;
+}
+}
+
+
+function getmonthid($i)
+{
+switch($i)
+{
+case "Baishakh":
+return 1;
+break;
+case "Jestha":
+return 2;
+break;
+case "Ashadh":
+return 3;
+break;
+case "Shrawan":
+return 4;
+break;
+case "Bhadra":
+return 5;
+break;
+case "Ashwin":
+return 6;
+break;
+case "Kartik":
+return 7;
+break;
+case "Mangsir":
+return 8;
+break;
+case "Poush":
+return 9;
+break;
+case "Magh":
+return 10;
+break;
+case "Falgun":
+return 11;
+break;
+case "Chaitra":
+return 12;
+break;
+}
+}
+// all the functions
+/*
+function passmarkst($th)
+{
+return ceil(($th*40)/100);
+}
+function passmarksp($pr)
+{
+return floor(($pr*40)/100);
+}
+
+*/
+function passmarkst($th,$year,$class,$exam)
+{
+$pas=givepasspercent($year,$class,$exam);
+return ceil(($th*$pas)/100);
+}
+function passmarksp($pr,$year,$class,$exam)
+{
+$pas=givepasspercent($year,$class,$exam);
+return floor(($pr*$pas)/100);
+}
+function getProductId($product)
+{
+	$que=mysql_query("select id from product where name='$product'");
+	return mysql_result($que,0,0);
+}
+function getProductName($id)
+{
+	$que=mysql_query("select name from product where id=$id");
+	return mysql_result($que,0,0);
+}
+function costOfProduct($id)
+{
+	$que=mysql_query("select cost from product where id=$id");
+	return mysql_result($que,0,0);
+}
+function get_page_display($id)
+{
+	$que=mysql_query("select text from page where id=$id");
+	if(mysql_num_rows($que)>0)
+	return mysql_result($que,0,'text');
+	else
+	return 0;
+}
+function nepdate()
+{
+$dat=date("Y-m-d");
+$q=mysql_query("select datenep from datecon where dateeng='$dat'");
+return mysql_result($q,0,0);
+}
+function givemonth($month)
+{
+$q=mysql_query("select monthname from datecon where mt=$month");
+return mysql_result($q,0,0);
+}
+function datenep($dat)
+{
+$q=mysql_query("select datenep from datecon where dateeng='$dat'");
+return mysql_result($q,0,0);
+}
+function dateengg($dat)
+{
+$q=mysql_query("select dateeng from datecon where datenep='$dat'");
+return mysql_result($q,0,0);
+}
+function getlastroll($class,$section,$year)
+{
+$q=mysql_query("select max(roll) from stdinfo where class=$class and section='$section' and year=$year");
+return mysql_result($q,0,0);
+}
+function getlastfeecol()
+{
+$q=mysql_query("select max(id) from feecol");
+if(mysql_num_rows($q)>0)
+return mysql_result($q,0,0);
+else
+return 1;
+}
+function getgrace($exam,$class,$year)
+{
+$q=mysql_query("select marks from grace where exam=$exam and class=$class and year=$year");
+return mysql_result($q,0,0);
+}
+function givestudentid($year,$roll,$class,$section)
+{
+$q=mysql_query("select id from stdinfo where class=$class and year=$year and roll=$roll and section='$section'");
+return mysql_result($q,0,0);
+}
+
+function classfromid($id)
+{
+	$que=mysql_query("select class from class where id='$id'");
+	return mysql_result($que,0,0);
+}
+function infofromid($id)
+{
+	$que=mysql_query("select name,class,roll,section from stdinfo where id=$id");
+	$data=mysql_fetch_assoc($que);
+	return $data;
+}
+function ecomarksth($id,$subno)
+{
+$exam=$_COOKIE['exam'];
+if($exam==1)
+$qu1=mysql_query("select t".$subno." from marks where stdid=$id");
+elseif($exam==2)
+$qu1=mysql_query("select t".$subno." from marks1 where stdid=$id");
+elseif($exam==3)
+$qu1=mysql_query("select t".$subno." from marks2 where stdid=$id");
+elseif($exam==4)
+$qu1=mysql_query("select t".$subno." from marks3 where stdid=$id");
+elseif($exam==5)
+$qu1=mysql_query("select t".$subno." from marks4 where stdid=$id");
+elseif($exam==6)
+$qu1=mysql_query("select t".$subno." from marks5 where stdid=$id");
+elseif($exam==7)
+$qu1=mysql_query("select t".$subno." from marks6 where stdid=$id");
+elseif($exam==8)
+$qu1=mysql_query("select t".$subno." from marks7 where stdid=$id");
+elseif($exam==9)
+$qu1=mysql_query("select t".$subno." from marks8 where stdid=$id");
+elseif($exam==10)
+$qu1=mysql_query("select t".$subno." from marks9 where stdid=$id");
+elseif($exam==11)
+$qu1=mysql_query("select t".$subno." from marks10 where stdid=$id");
+elseif($exam==12)
+$qu1=mysql_query("select t".$subno." from marks11 where stdid=$id");
+elseif($exam==13)
+$qu1=mysql_query("select t".$subno." from marks12 where stdid=$id");
+elseif($exam==14)
+$qu1=mysql_query("select t".$subno." from marks13 where stdid=$id");
+elseif($exam==15)
+$qu1=mysql_query("select t".$subno." from marks14 where stdid=$id");
+return mysql_result($qu1,0,0);
+}
+function ecomarkspr($id,$subno)
+{
+$exam=$_COOKIE['exam'];
+if($exam==1)
+$qu1=mysql_query("select p".$subno." from marks where stdid=$id");
+elseif($exam==2)
+$qu1=mysql_query("select p".$subno." from marks1 where stdid=$id");
+elseif($exam==3)
+$qu1=mysql_query("select p".$subno." from marks2 where stdid=$id");
+elseif($exam==4)
+$qu1=mysql_query("select p".$subno." from marks3 where stdid=$id");
+elseif($exam==5)
+$qu1=mysql_query("select p".$subno." from marks4 where stdid=$id");
+elseif($exam==6)
+$qu1=mysql_query("select p".$subno." from marks5 where stdid=$id");
+elseif($exam==7)
+$qu1=mysql_query("select p".$subno." from marks6 where stdid=$id");
+return mysql_result($qu1,0,0);
+}
+function getidforstudent()
+{
+$qu=mysql_query("select * from stdinfo");
+if(mysql_num_rows($qu)==0)
+$id=0;
+else
+$id=mysql_result(mysql_query("select max(id) from stdinfo"),0,0);
+return $id;
+}
+function classfromname($name)
+{
+	$que=mysql_query("select class from class where name='$name'");
+	return mysql_result($que,0,0);
+}
+function namefromclass($class)
+{
+	$que=mysql_query("select name from class where class=$class");
+	return mysql_result($que,0,0);
+}
+function idfromclass($class)
+{
+	$que=mysql_query("select id from class where class=$class");
+	return mysql_result($que,0,0);
+}
+function checkprac($sub)
+{
+$q=mysql_query("select practical from subject where sid=$sub");
+return mysql_result($q,0,0);
+}
+function checkpraci($sub,$class)
+{
+$q=mysql_query("select practical from subject where subno=$sub and class=$class");
+return mysql_result($q,0,0);
+}
+function subjectdetail($sub,$class)
+{
+$q=mysql_query("select practical,optional,sid,scode from subject where subno=$sub and class=$class");
+//echo "select practical,optional,sid,scode from subject where subno=$sub and class=$class<br>";
+$a[0]=mysql_result($q,0,0);
+$a[1]=mysql_result($q,0,1);
+$a[2]=mysql_result($q,0,2);
+$a[3]=mysql_result($q,0,3);
+return $a;
+}
+function getsubid($sub,$class)
+{
+$q=mysql_query("select sid from subject where subno=$sub and class=$class");
+return mysql_result($q,0,0);
+}
+function givesubidd($stdid,$i)
+{
+$coll="opt".$i;
+$q=mysql_query("select $coll from optional_subjects where stdid=$stdid");
+//echo "select $coll from optional_subjects where stdid=$stdid";
+return mysql_result($q,0,0);
+}
+function classofstudent($stdid)
+{
+$q=mysql_query("select class from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+function opt2ofstudent($stdid)
+{
+$q=mysql_query("select opt2 from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+
+function givepasspercent($year,$class,$exam)
+{
+/*if($exam==1 || $exam==2 || $exam==3 || $exam==3 || $exam==4 || $exam==5 || $exam==6 || $exam==7 || $exam==8 || $exam==9 || $exam==10 || $exam==11 || $exam==12 || $exam==13 || $exam==14)
+$exam=$exam;
+else
+$exam=idfromexam($exam,$year);*/
+$q=mysql_query("select pp from pper where exam=$exam and class=$class") or die(mysql_error());
+if(mysql_num_rows($q)>0)
+return mysql_result($q,0,0);
+else
+return "xx";
+}
+function getcarry($year,$exam)
+{
+$q=mysql_query("select carryper from carry where exam=$exam and year=$year");
+return mysql_result($q,0,0);
+}
+function getfee($id,$year,$class)
+{
+$q=mysql_query("select amt from fees where feecol=$id and class=$class and year=$year");
+if(mysql_num_rows($q)==0)
+return 0;
+else
+return mysql_result($q,0,0);
+}
+function sectionofstudent($stdid)
+{
+$q=mysql_query("select section from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+function nameofstudent($stdid)
+{
+$q=mysql_query("select name from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+function idfromexam($exam,$year)
+{
+$qaq=mysql_query("select examid from exam where name='$exam' and year=$year");
+return mysql_result($qaq,0,0);
+}
+function examfromid($id,$year)
+{
+$qaq=mysql_query("select name from exam where examid=$id and year=$year");
+return mysql_result($qaq,0,0);
+}
+function givemesubjectt($class,$no)
+{
+$q=mysql_query("select name from subject where class=$class and subno=$no");
+return mysql_result($q,0,0);
+}
+function checkcompany()
+{
+	if(mysql_num_rows(mysql_query("select * from company"))>0)
+	return 1;
+	else
+	return 0;
+}
+function subjectfromcode($subno,$class,$year)
+{
+$qu=mysql_query("select name from subject where class=$class and subno=$subno and year=$year");
+return mysql_result($qu,0,0);
+}
+function subjectfromcodes($subno,$class,$year)
+{
+$qu=mysql_query("select name from subject where class=$class and sid=$subno and year=$year");
+return mysql_result($qu,0,0);
+}
+function subjectfromid($id)
+{
+$qu=mysql_query("select name from subject where sid=$id");
+return mysql_result($qu,0,0);
+}
+function idfromsubject($subject,$class,$year)
+{
+$qu=mysql_query("select sid from subject where class=$class and name='$subject' and year=$year");
+return mysql_result($qu,0,0);
+}
+function idfromsub($subject,$class,$year)
+{
+$qu=mysql_query("select sid from subject where class=$class and subno=$subject and year=$year");
+return mysql_result($qu,0,0);
+}
+function subhigh($class,$sub,$year,$exam)
+{
+}
+function codefromsubject($subject,$class,$year)
+{
+$qu=mysql_query("select subno from subject where class=$class and name='$subject' and year=$year");
+return mysql_result($qu,0,0);
+}
+function givethpr($subid)
+{
+$exam=$_COOKIE['exam'];
+$qu=mysql_query("select * from setfm where subject=$subid and exam=$exam");
+$data=mysql_fetch_object($qu);
+$m[0]=$data->th;
+$m[1]=$data->pr;
+return $m;
+}
+function givethpr1($subid,$exam)
+{
+$qu=mysql_query("select * from setfm where subject=$subid and exam=$exam");
+$data=mysql_fetch_object($qu);
+$m[0]=$data->th;
+$m[1]=$data->pr;
+return $m;
+}
+
+function do_the_bla($user,$pass)
+{
+$_rval[0]=0;
+$q=mysql_query("select id,access from auth where username='$user' and password='".prepro($pass)."'") or die(mysql_error());
+if(mysql_num_rows($q)>0)
+{
+$id=mysql_result($q,0,0);
+$access=mysql_result($q,0,1);
+$_rval[0]=1;
+$_rval[1]=$id;
+$_rval[2]=$access;
+}
+return $_rval;
+}
+function prepro($a) {return sha1($a);}
+
+function getnoss($class,$year)
+{
+$q=mysql_query("select nos from class where class=$class and year=$year");
+return mysql_result($q,0,0);
+}
+function rank($obt,$class,$result)
+{
+$ssqqll=mysql_query("SELECT id FROM stdinfo WHERE class=$class");
+				$pp=1;
+				while($d=mysql_fetch_object($ssqqll))
+				{
+					$id=$d->id;
+					$t=mysql_fetch_object(mysql_query("select * from $result where stdid=$id"));
+					if($t->result=="Passed")
+					{
+					$tm_col[$pp]=$t->total;
+					$pp++;
+					}
+				}
+
+
+$xx=$tm_col;
+$yy=$obt;
+rsort($xx);
+$c=$yy;
+$y=1;
+$check=alter;
+foreach($xx as $b)
+{
+if($c==$b)
+{
+$p=$y;
+break;
+}
+if($check==$b)
+$y--;
+$y++;
+
+$check=$b;
+}
+return $p;
+
+
+
+}
+
+
+function rank1($obt,$class,$result,$section)
+{
+$ssqqll=mysql_query("SELECT id FROM stdinfo WHERE class=$class and section='$section'");
+				$pp=1;
+				while($d=mysql_fetch_object($ssqqll))
+				{
+					$id=$d->id;
+					$t=mysql_fetch_object(mysql_query("select * from $result where stdid=$id"));
+					if($t->result=="Passed")
+					{
+					$tm_col[$pp]=$t->total;
+					$pp++;
+					}
+				}
+
+
+$xx=$tm_col;
+$yy=$obt;
+rsort($xx);
+$c=$yy;
+$y=1;
+$check=alter;
+foreach($xx as $b)
+{
+if($c==$b)
+{
+$p=$y;
+break;
+}
+if($check==$b)
+$y--;
+$y++;
+
+$check=$b;
+}
+return $p;
+}
+
+function getchar($num)
+{
+switch($num)
+{
+case 'A':
+case 'a':
+return -2;
+break;
+case 'B':
+case 'b':
+return -3;
+break;
+case 'C':
+case 'c':
+return -4;
+break;
+case 'D':
+case 'd':
+return -5;
+break;case 'E':
+case 'e':
+return -6;
+break;
+default:
+return $num;
+}
+}
+
+
+
+function getnumfromchar($char)
+{
+switch($char)
+{
+case -2:
+return 'A';
+break;
+case -3:
+return 'B';
+break;
+case -4:
+return 'C';
+break;
+case -5:
+return 'D';
+break;
+case -6:
+return 'E';
+break;
+default:
+return $char;
+}
+}
+
+function feecolid($fee)
+{
+$q=mysql_query("select id from feecol where title='$fee'");
+return mysql_result($q,0,0);
+}
+function feecoltitle($id)
+{
+$q=mysql_query("select title from feecol where id=$id");
+return mysql_result($q,0,0);
+}
+function getcolumn1($col)
+{
+$q=mysql_query("select title,mode,taxable from feecol where id=$col");
+$x[0]=mysql_result($q,0,0);
+$x[1]=mysql_result($q,0,1);
+$x[2]=mysql_result($q,0,2);
+return $x;
+}
+function getcolumn2($col)
+{
+$q=mysql_query("select title,mode,taxable from feecol where id=$col");
+$x[0]=mysql_result($q,0,0);
+$x[1]=mysql_result($q,0,1);
+$x[2]=mysql_result($q,0,2);
+return $x;
+}
+function getcolumn($col)
+{
+$q=mysql_query("select title from feecol where id=$col");
+return mysql_result($q,0,0);
+}
+function getinctopic($col)
+{
+$q=mysql_query("select topic from income_master where id=$col");
+return mysql_result($q,0,0);
+}
+function tenth($a)
+{
+	switch($a)
+	{
+	case 1:
+	return "Ten";
+	break;
+	case 2:
+	return "Twenty";
+	break;
+	case 3:
+	return "Thirty";
+	break;
+	case 4:
+	return "Forty";
+	break;
+	case 5:
+	return "Fifty";
+	break;
+	case 6:
+	return "Sixty";
+	break;
+	case 7:
+	return "Seventy";
+	break;
+	case 8:
+	return "Eighty";
+	break;
+	case 9:
+	return "Ninety";
+	break;
+	}
+}
+function ones($a)
+{
+	switch($a)
+	{
+	case 1:
+	return "One";
+	break;
+	case 2:
+	return "Two";
+	break;
+	case 3:
+	return "Three";
+	break;
+	case 4:
+	return "Four";
+	break;
+	case 5:
+	return "Five";
+	break;
+	case 6:
+	return "Six";
+	break;
+	case 7:
+	return "Seven";
+	break;
+	case 8:
+	return "Eight";
+	break;
+	case 9:
+	return "Nine";
+	break;
+	}
+}
+function tens($a)
+{
+	if($a<10)
+	{
+	return ones($a);
+	}
+	elseif($a<20)
+	{
+			switch($a)
+			{
+			case 10:
+			return "Ten";
+			break;
+			case 11:
+			return "Eleven";
+			break;
+			case 12:
+			return "Twelve";
+			break;
+			case 13:
+			return "Thirteen";
+			break;
+			case 14:
+			return "Fourteen";
+			break;
+			case 15:
+			return "Fifteen";
+			break;
+			case 16:
+			return "Sixteen";
+			break;
+			case 17:
+			return "Seventeen";
+			break;
+			case 18:
+			return "Eighteen";
+			break;
+			case 19:
+			return "Nineteen";
+			break;
+			}
+	}
+	else
+	{
+		$ones=$a%10;
+		$tens=intval($a/10) % 10;
+		$w=tenth($tens)." ".ones($ones);
+		return $w;
+	}
+}
+function hundreds($a)
+{
+	$hun=ones(intval($a/100));
+	$te=substr($a,(strlen($a)-2),2);
+	$ten=tens($te);
+	return $hun." Hundred ".$ten;
+}
+function thousands($a)
+{
+	$thou=ones(intval($a/1000));
+	$hunv=intval($a/100)%10;
+	$ten=tens($a%100);
+	if($hunv==0)
+	return $thou." Thousand ".$ten;
+	else
+	{
+	$hun=ones($hunv);
+	return $thou." Thousand ".$hun." Hundred ".$ten;
+	}
+}
+function tthou($a)
+{
+	$thou=tens(intval($a/1000));
+	$hunv=intval($a/100)%10;
+	$ten=tens($a%1000);
+	if($hunv==0)
+	return $thou." Thousand ".$ten;
+	else
+	{
+	$hun=ones($hunv);
+	return $thou." Thousand ".$hun." Hundred ".$ten;
+	}
+}
+function inwords($a)
+{
+	if(strchr($a,"."))
+		if(strlen(strchr($a,"."))==3)
+		$paisa=tens(substr($a,(strlen($a)-2),2));
+		else
+		$paisa=tenth(substr($a,(strlen($a)-1),1));
+	else
+	$paisa='';
+	if($a<10)
+	$rupees=ones($a);
+	elseif($a<100)
+	$rupees= tens($a);
+	elseif($a<1000)
+	$rupees= hundreds($a);
+	elseif($a<10000)
+	$rupees= thousands($a);
+	elseif($a<=100000)
+	$rupees=tthou($a);
+	else
+	$rupees= $a;
+	$xx=$rupees." Rupees";
+	if($paisa!='')
+	$xx.=" And ".$paisa." Paisa";
+	$xx.=" Only";
+	echo $xx;
+}
+function generateid()
+{
+$q=mysql_query("select max(id) from stdinfo");
+$id=mysql_result($q,0,0);
+return ++$id;
+}
+function idforincometopic($topic)
+{
+$query=mysql_query("select id from income_master where topic='$topic'");
+return mysql_result($query,0,0);
+}
+function idforexpensetopic($topic)
+{
+$query=mysql_query("select id from expense_master where topic='$topic'");
+return mysql_result($query,0,0);
+}
+function expensetopic($id)
+{
+$query=mysql_query("select topic from expense_master where id=$id");
+return mysql_result($query,0,0);
+}
+function incometopic($id)
+{
+$query=mysql_query("select topic from income_master where id=$id");
+return mysql_result($query,0,0);
+}
+function checkpageaccess($pid,$access)
+{
+$q=mysql_query("select access from page where id=$pid");
+$ac=mysql_result($q,0,0);
+if($ac==$access)
+return(1);
+elseif($access==1 && $ac==0)
+return(1);
+elseif($access==2 && $ac==0)
+return(1);
+elseif(($access==3 && $ac==0) || ($access==3 && $ac==1) || ($access==3 && $ac==2))
+return(1);
+else
+return(0);
+}
+?>
+<?php
+/*
+include_once("connect.php");
+
+function taxinfo($name)
+{
+$q=mysql_query("select taxable from feecol where title='$name'");
+return mysql_result($q,0,0);
+}
+function idforfeerecord()
+{
+$x=1;
+$query=mysql_query("select max(bill_no) from fee_record");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function idforreceipta()
+{
+$x=1;
+$query=mysql_query("select max(id) from receipt");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function idforreceipt()
+{
+$x=1;
+$query=mysql_query("select max(receipt_no) from receipt");
+$x+=mysql_result($query,0,0);
+return $x;
+}
+function getmonth($i)
+{
+switch($i)
+{
+case 1:
+return "Baishakh";
+break;
+case 2:
+return "Jestha";
+break;
+case 3:
+return "Ashadh";
+break;
+case 4:
+return "Shrawan";
+break;
+case 5:
+return "Bhadra";
+break;
+case 6:
+return "Ashwin";
+break;
+case 7:
+return "Kartik";
+break;
+case 8:
+return "Mangsir";
+break;
+case 9:
+return "Poush";
+break;
+case 10:
+return "Magh";
+break;
+case 11:
+return "Falgun";
+break;
+case 12:
+return "Chaitra";
+break;
+}
+}
+
+
+function getmonthid($i)
+{
+switch($i)
+{
+case "Baishakh":
+return 1;
+break;
+case "Jestha":
+return 2;
+break;
+case "Ashadh":
+return 3;
+break;
+case "Shrawan":
+return 4;
+break;
+case "Bhadra":
+return 5;
+break;
+case "Ashwin":
+return 6;
+break;
+case "Kartik":
+return 7;
+break;
+case "Mangsir":
+return 8;
+break;
+case "Poush":
+return 9;
+break;
+case "Magh":
+return 10;
+break;
+case "Falgun":
+return 11;
+break;
+case "Chaitra":
+return 12;
+break;
+}
+}
+*/
+// all the functions
+/*
+function passmarkst($th)
+{
+return ceil(($th*40)/100);
+}
+function passmarksp($pr)
+{
+return floor(($pr*40)/100);
+}
+
+*/
+
+/*
+function passmarkst($th,$year,$class,$exam)
+{
+$pas=givepasspercent($year,$class,$exam);
+return ceil(($th*$pas)/100);
+}
+function passmarksp($pr,$year,$class,$exam)
+{
+$pas=givepasspercent($year,$class,$exam);
+return floor(($pr*$pas)/100);
+}
+function getProductId($product)
+{
+	$que=mysql_query("select id from product where name='$product'");
+	return mysql_result($que,0,0);
+}
+function getProductName($id)
+{
+	$que=mysql_query("select name from product where id=$id");
+	return mysql_result($que,0,0);
+}
+function costOfProduct($id)
+{
+	$que=mysql_query("select cost from product where id=$id");
+	return mysql_result($que,0,0);
+}
+function get_page_display($id)
+{
+	$que=mysql_query("select text from page where id=$id");
+	if(mysql_num_rows($que)>0)
+	return mysql_result($que,0,'text');
+	else
+	return 0;
+}
+function nepdate()
+{
+$dat=date("Y-m-d");
+$q=mysql_query("select datenep from datecon where dateeng='$dat'");
+return mysql_result($q,0,0);
+}
+function givemonth($month)
+{
+$q=mysql_query("select monthname from datecon where mt=$month");
+return mysql_result($q,0,0);
+}
+function datenep($dat)
+{
+$q=mysql_query("select datenep from datecon where dateeng='$dat'");
+return mysql_result($q,0,0);
+}
+function dateengg($dat)
+{
+$q=mysql_query("select dateeng from datecon where datenep='$dat'");
+return mysql_result($q,0,0);
+}
+function getlastroll($class,$section,$year)
+{
+$q=mysql_query("select max(roll) from stdinfo where class=$class and section='$section' and year=$year");
+return mysql_result($q,0,0);
+}
+function getlastfeecol()
+{
+$q=mysql_query("select max(id) from feecol");
+if(mysql_num_rows($q)>0)
+return mysql_result($q,0,0);
+else
+return 1;
+}
+function getgrace($exam,$class,$year)
+{
+$q=mysql_query("select marks from grace where exam=$exam and class=$class and year=$year");
+return mysql_result($q,0,0);
+}
+function givestudentid($year,$roll,$class,$section)
+{
+$q=mysql_query("select id from stdinfo where class=$class and year=$year and roll=$roll and section='$section'");
+return mysql_result($q,0,0);
+}
+
+function classfromid($id)
+{
+	$que=mysql_query("select class from class where id='$id'");
+	return mysql_result($que,0,0);
+}
+function infofromid($id)
+{
+	$que=mysql_query("select name,class,roll,section from stdinfo where id=$id");
+	$data=mysql_fetch_assoc($que);
+	return $data;
+}
+function ecomarksth($id,$subno)
+{
+$exam=$_COOKIE['exam'];
+if($exam==1)
+$qu1=mysql_query("select t".$subno." from marks where stdid=$id");
+elseif($exam==2)
+$qu1=mysql_query("select t".$subno." from marks1 where stdid=$id");
+elseif($exam==3)
+$qu1=mysql_query("select t".$subno." from marks2 where stdid=$id");
+elseif($exam==4)
+$qu1=mysql_query("select t".$subno." from marks3 where stdid=$id");
+elseif($exam==5)
+$qu1=mysql_query("select t".$subno." from marks4 where stdid=$id");
+elseif($exam==6)
+$qu1=mysql_query("select t".$subno." from marks5 where stdid=$id");
+elseif($exam==7)
+$qu1=mysql_query("select t".$subno." from marks6 where stdid=$id");
+return mysql_result($qu1,0,0);
+}
+function ecomarkspr($id,$subno)
+{
+$exam=$_COOKIE['exam'];
+if($exam==1)
+$qu1=mysql_query("select p".$subno." from marks where stdid=$id");
+elseif($exam==2)
+$qu1=mysql_query("select p".$subno." from marks1 where stdid=$id");
+elseif($exam==3)
+$qu1=mysql_query("select p".$subno." from marks2 where stdid=$id");
+elseif($exam==4)
+$qu1=mysql_query("select p".$subno." from marks3 where stdid=$id");
+elseif($exam==5)
+$qu1=mysql_query("select p".$subno." from marks4 where stdid=$id");
+elseif($exam==6)
+$qu1=mysql_query("select p".$subno." from marks5 where stdid=$id");
+elseif($exam==7)
+$qu1=mysql_query("select p".$subno." from marks6 where stdid=$id");
+return mysql_result($qu1,0,0);
+}
+function getidforstudent()
+{
+$qu=mysql_query("select * from stdinfo");
+if(mysql_num_rows($qu)==0)
+$id=0;
+else
+$id=mysql_result(mysql_query("select max(id) from stdinfo"),0,0);
+return $id;
+}
+function classfromname($name)
+{
+	$que=mysql_query("select class from class where name='$name'");
+	return mysql_result($que,0,0);
+}
+function namefromclass($class)
+{
+	$que=mysql_query("select name from class where class=$class");
+	return mysql_result($que,0,0);
+}
+function idfromclass($class)
+{
+	$que=mysql_query("select id from class where class=$class");
+	return mysql_result($que,0,0);
+}
+function checkprac($sub)
+{
+$q=mysql_query("select practical from subject where sid=$sub");
+return mysql_result($q,0,0);
+}
+function checkpraci($sub,$class)
+{
+$q=mysql_query("select practical from subject where subno=$sub and class=$class");
+return mysql_result($q,0,0);
+}
+function getsubid($sub,$class)
+{
+$q=mysql_query("select sid from subject where subno=$sub and class=$class");
+return mysql_result($q,0,0);
+}
+function classofstudent($stdid)
+{
+$q=mysql_query("select class from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+function opt2ofstudent($stdid)
+{
+$q=mysql_query("select opt2 from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+
+function givepasspercent($year,$class,$exam)
+{
+if($exam==1 || $exam==2 || $exam==3 || $exam==3 || $exam==4 || $exam==5 || $exam==6 || $exam==7 || $exam==8 || $exam==9 || $exam==10)
+$exam=$exam;
+else
+$exam=idfromexam($exam,$year);
+$q=mysql_query("select pp from pper where exam=$exam and year=$year and class=$class") or die(mysql_error());
+if(mysql_num_rows($q)>0)
+return mysql_result($q,0,0);
+else
+return "xx";
+}
+function getcarry($year,$exam)
+{
+$q=mysql_query("select carryper from carry where exam=$exam and year=$year");
+return mysql_result($q,0,0);
+}
+function getfee($id,$year,$class)
+{
+$q=mysql_query("select amt from fees where feecol=$id and class=$class and year=$year");
+if(mysql_num_rows($q)==0)
+return 0;
+else
+return mysql_result($q,0,0);
+}
+function sectionofstudent($stdid)
+{
+$q=mysql_query("select section from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+function nameofstudent($stdid)
+{
+$q=mysql_query("select name from stdinfo where id=$stdid");
+return mysql_result($q,0,0);
+}
+function idfromexam($exam,$year)
+{
+$qaq=mysql_query("select examid from exam where name='$exam' and year=$year");
+return mysql_result($qaq,0,0);
+}
+function examfromid($id,$year)
+{
+$qaq=mysql_query("select name from exam where examid=$id and year=$year");
+return mysql_result($qaq,0,0);
+}
+function checkcompany()
+{
+	if(mysql_num_rows(mysql_query("select * from company"))>0)
+	return 1;
+	else
+	return 0;
+}
+function subjectfromcode($subno,$class,$year)
+{
+$qu=mysql_query("select name from subject where class=$class and subno=$subno and year=$year");
+return mysql_result($qu,0,0);
+}
+function subjectfromid($id)
+{
+$qu=mysql_query("select name from subject where sid=$id");
+return mysql_result($qu,0,0);
+}
+function idfromsubject($subject,$class,$year)
+{
+$qu=mysql_query("select sid from subject where class=$class and name='$subject' and year=$year");
+return mysql_result($qu,0,0);
+}
+function idfromsub($subject,$class,$year)
+{
+$qu=mysql_query("select sid from subject where class=$class and subno=$subject and year=$year");
+return mysql_result($qu,0,0);
+}
+function subhigh($class,$sub,$year,$exam)
+{
+}
+function codefromsubject($subject,$class,$year)
+{
+$qu=mysql_query("select subno from subject where class=$class and name='$subject' and year=$year");
+return mysql_result($qu,0,0);
+}
+function givethpr($subid)
+{
+$exam=$_COOKIE['exam'];
+$qu=mysql_query("select * from setfm where subject=$subid and exam=$exam");
+$data=mysql_fetch_object($qu);
+$m[0]=$data->th;
+$m[1]=$data->pr;
+return $m;
+}
+function givethpr1($subid,$exam)
+{
+$qu=mysql_query("select * from setfm where subject=$subid and exam=$exam");
+$data=mysql_fetch_object($qu);
+$m[0]=$data->th;
+$m[1]=$data->pr;
+return $m;
+}
+
+function do_the_bla($user,$pass)
+{
+$_rval[0]=0;
+$q=mysql_query("select id,access from auth where username='$user' and password='".prepro($pass)."'");
+if(mysql_num_rows($q)>0)
+{
+$id=mysql_result($q,0,0);
+$access=mysql_result($q,0,1);
+$_rval[0]=1;
+$_rval[1]=$id;
+$_rval[2]=$access;
+}
+return $_rval;
+}
+function prepro($a) {return sha1($a);}
+function getnoss($class,$year)
+{
+$q=mysql_query("select nos from class where class=$class and year=$year");
+return mysql_result($q,0,0);
+}
+function rank($obt,$class,$result)
+{
+$ssqqll=mysql_query("SELECT id FROM stdinfo WHERE class=$class");
+				$pp=1;
+				while($d=mysql_fetch_object($ssqqll))
+				{
+					$id=$d->id;
+					$t=mysql_fetch_object(mysql_query("select * from $result where stdid=$id"));
+					if($t->result=="Passed")
+					{
+					$tm_col[$pp]=$t->total;
+					$pp++;
+					}
+				}
+
+
+$xx=$tm_col;
+$yy=$obt;
+rsort($xx);
+$c=$yy;
+$y=1;
+$check=alter;
+foreach($xx as $b)
+{
+if($c==$b)
+{
+$p=$y;
+break;
+}
+if($check==$b)
+$y--;
+$y++;
+
+$check=$b;
+}
+return $p;
+
+
+
+}
+
+
+function rank1($obt,$class,$result,$section)
+{
+$ssqqll=mysql_query("SELECT id FROM stdinfo WHERE class=$class and section='$section'");
+				$pp=1;
+				while($d=mysql_fetch_object($ssqqll))
+				{
+					$id=$d->id;
+					$t=mysql_fetch_object(mysql_query("select * from $result where stdid=$id"));
+					if($t->result=="Passed")
+					{
+					$tm_col[$pp]=$t->total;
+					$pp++;
+					}
+				}
+
+
+$xx=$tm_col;
+$yy=$obt;
+rsort($xx);
+$c=$yy;
+$y=1;
+$check=alter;
+foreach($xx as $b)
+{
+if($c==$b)
+{
+$p=$y;
+break;
+}
+if($check==$b)
+$y--;
+$y++;
+
+$check=$b;
+}
+return $p;
+}
+
+function getchar($num)
+{
+switch($num)
+{
+case 'A':
+case 'a':
+return -2;
+break;
+case 'B':
+case 'b':
+return -3;
+break;
+case 'C':
+case 'c':
+return -4;
+break;
+case 'D':
+case 'd':
+return -5;
+break;case 'E':
+case 'e':
+return -6;
+break;
+default:
+return $num;
+}
+}
+
+
+
+function getnumfromchar($char)
+{
+switch($char)
+{
+case -2:
+return 'A';
+break;
+case -3:
+return 'B';
+break;
+case -4:
+return 'C';
+break;
+case -5:
+return 'D';
+break;
+case -6:
+return 'E';
+break;
+default:
+return $char;
+}
+}
+
+function feecolid($fee)
+{
+$q=mysql_query("select id from feecol where title='$fee'");
+return mysql_result($q,0,0);
+}
+function feecoltitle($id)
+{
+$q=mysql_query("select title from feecol where id=$id");
+return mysql_result($q,0,0);
+}
+function getcolumn1($col)
+{
+$q=mysql_query("select title,mode from feecol where id=$col");
+$x[0]=mysql_result($q,0,0);
+$x[1]=mysql_result($q,0,1);
+return $x;
+}
+function getcolumn2($col)
+{
+$q=mysql_query("select title,mode,taxable from feecol where id=$col");
+$x[0]=mysql_result($q,0,0);
+$x[1]=mysql_result($q,0,1);
+$x[2]=mysql_result($q,0,2);
+return $x;
+}
+function getcolumn($col)
+{
+$q=mysql_query("select title from feecol where id=$col");
+return mysql_result($q,0,0);
+}
+function tenth($a)
+{
+	switch($a)
+	{
+	case 1:
+	return "Ten";
+	break;
+	case 2:
+	return "Twenty";
+	break;
+	case 3:
+	return "Thirty";
+	break;
+	case 4:
+	return "Forty";
+	break;
+	case 5:
+	return "Fifty";
+	break;
+	case 6:
+	return "Sixty";
+	break;
+	case 7:
+	return "Seventy";
+	break;
+	case 8:
+	return "Eighty";
+	break;
+	case 9:
+	return "Ninety";
+	break;
+	}
+}
+function ones($a)
+{
+	switch($a)
+	{
+	case 1:
+	return "One";
+	break;
+	case 2:
+	return "Two";
+	break;
+	case 3:
+	return "Three";
+	break;
+	case 4:
+	return "Four";
+	break;
+	case 5:
+	return "Five";
+	break;
+	case 6:
+	return "Six";
+	break;
+	case 7:
+	return "Seven";
+	break;
+	case 8:
+	return "Eight";
+	break;
+	case 9:
+	return "Nine";
+	break;
+	}
+}
+function tens($a)
+{
+	if($a<10)
+	{
+	return ones($a);
+	}
+	elseif($a<20)
+	{
+			switch($a)
+			{
+			case 10:
+			return "Ten";
+			break;
+			case 11:
+			return "Eleven";
+			break;
+			case 12:
+			return "Twelve";
+			break;
+			case 13:
+			return "Thirteen";
+			break;
+			case 14:
+			return "Fourteen";
+			break;
+			case 15:
+			return "Fifteen";
+			break;
+			case 16:
+			return "Sixteen";
+			break;
+			case 17:
+			return "Seventeen";
+			break;
+			case 18:
+			return "Eighteen";
+			break;
+			case 19:
+			return "Nineteen";
+			break;
+			}
+	}
+	else
+	{
+		$ones=$a%10;
+		$tens=intval($a/10) % 10;
+		$w=tenth($tens)." ".ones($ones);
+		return $w;
+	}
+}
+
+function hundreds($a)
+{
+	$hun=ones(intval($a/100));
+	$te=substr($a,(strlen($a)-2),2);
+	$ten=tens($te);
+	return $hun." Hundred ".$ten;
+}
+function thousands($a)
+{
+	$thou=ones(intval($a/1000));
+	$hunv=intval($a/100)%10;
+	$ten=tens($a%100);
+	if($hunv==0)
+	return $thou." Thousand ".$ten;
+	else
+	{
+	$hun=ones($hunv);
+	return $thou." Thousand ".$hun." Hundred ".$ten;
+	}
+}
+function tthou($a)
+{
+	$thou=tens(intval($a/1000));
+	$hunv=intval($a/100)%10;
+	$ten=tens($a%1000);
+	if($hunv==0)
+	return $thou." Thousand ".$ten;
+	else
+	{
+	$hun=ones($hunv);
+	return $thou." Thousand ".$hun." Hundred ".$ten;
+	}
+}
+function inwords($a)
+{
+	if(strchr($a,"."))
+		if(strlen(strchr($a,"."))==3)
+		$paisa=tens(substr($a,(strlen($a)-2),2));
+		else
+		$paisa=tenth(substr($a,(strlen($a)-1),1));
+	else
+	$paisa='';
+	if($a<10)
+	$rupees=ones($a);
+	elseif($a<100)
+	$rupees= tens($a);
+	elseif($a<1000)
+	$rupees= hundreds($a);
+	elseif($a<10000)
+	$rupees= thousands($a);
+	elseif($a<=100000)
+	$rupees=tthou($a);
+	else
+	$rupees= $a;
+	$xx=$rupees." Rupees";
+	if($paisa!='')
+	$xx.=" And ".$paisa." Paisa";
+	$xx.=" Only";
+	echo $xx;
+}
+function generateid()
+{
+$q=mysql_query("select max(id) from stdinfo");
+$id=mysql_result($q,0,0);
+return ++$id;
+}
+function idforincometopic($topic)
+{
+$query=mysql_query("select id from income_master where topic='$topic'");
+return mysql_result($query,0,0);
+}
+function idforexpensetopic($topic)
+{
+$query=mysql_query("select id from expense_master where topic='$topic'");
+return mysql_result($query,0,0);
+}
+function expensetopic($id)
+{
+$query=mysql_query("select topic from expense_master where id=$id");
+return mysql_result($query,0,0);
+}
+function incometopic($id)
+{
+$query=mysql_query("select topic from income_master where id=$id");
+return mysql_result($query,0,0);
+}
+function checkpageaccess($pid,$access)
+{
+$q=mysql_query("select access from page where id=$pid");
+$ac=mysql_result($q,0,0);
+if($ac==$access)
+return(1);
+elseif($access==1 && $ac==0)
+return(1);
+elseif($access==2 && $ac==0)
+return(1);
+elseif(($access==3 && $ac==0) || ($access==3 && $ac==1) || ($access==3 && $ac==2))
+return(1);
+else
+return(0);
+}
+*/
+function result_overall($class,$year,$result)
+{
+$a=mysql_query("Select count(stdid) from $result where class=$class and year=$year");
+$b=mysql_query("Select count(stdid) from $result where class=$class and per>=80 and result='Passed'  and year=$year");
+$c=mysql_query("Select count(stdid) from $result where class=$class and per>=60 and per<80 and result='Passed' and year=$year");
+$d=mysql_query("Select count(stdid) from $result where class=$class and per>=45 and per<60 and result='Passed'  and year=$year");
+$e=mysql_query("Select count(stdid) from $result where class=$class and per>=32 and per<45 and result='Passed'  and year=$year");
+$f=mysql_query("Select count(stdid) from $result where class=$class and result='Failed'  and year=$year");
+$g=mysql_query("Select avg(per) from $result where class=$class");
+$rv[5]=mysql_result($a,0,0);
+$rv[0]=mysql_result($b,0,0);
+$rv[1]=mysql_result($c,0,0);
+$rv[2]=mysql_result($d,0,0);
+$rv[3]=mysql_result($e,0,0);
+$rv[4]=mysql_result($f,0,0);
+$rv[6]=round(mysql_result($g,0,0),2);
+return $rv;
+}
+function result_overall1($class,$year,$result,$section)
+{
+$a=mysql_query("Select count(stdid) from $result where class=$class and year=$year and section='$section'");
+$b=mysql_query("Select count(stdid) from $result where class=$class and per>=80 and result='Passed'  and year=$year and section='$section';");
+$c=mysql_query("Select count(stdid) from $result where class=$class and per>=60 and per<80 and result='Passed' and year=$year and section='$section'");
+$d=mysql_query("Select count(stdid) from $result where class=$class and per>=45 and per<60 and result='Passed'  and year=$year and section='$section'");
+$e=mysql_query("Select count(stdid) from $result where class=$class and per>=32 and per<45 and result='Passed'  and year=$year and section='$section';");
+$f=mysql_query("Select count(stdid) from $result where class=$class and result='Failed'  and year=$year and section='$section'");
+$g=mysql_query("Select avg(per) from $result where class=$class and section='$section'");
+$rv[5]=mysql_result($a,0,0);
+$rv[0]=mysql_result($b,0,0);
+$rv[1]=mysql_result($c,0,0);
+$rv[2]=mysql_result($d,0,0);
+$rv[3]=mysql_result($e,0,0);
+$rv[4]=mysql_result($f,0,0);
+$rv[6]=round(mysql_result($g,0,0),2);
+return $rv;
+}
+
+function dtopper($class,$section,$result)
+{
+$ss=mysql_query("select * from stdinfo inner join $result on stdinfo.id=$result.stdid and stdinfo.section='$section' and stdinfo.class=$class order by $result.per DESC LIMIT 0,10");
+$i=0;
+while($data=mysql_fetch_object($ss))
+{
+$x[$i]['name']=$data->name;
+$x[$i++]['per']=$data->per;
+}
+return $x;
+}
+function dtopperc($class,$result)
+{
+$ss=mysql_query("select * from stdinfo inner join $result on stdinfo.id=$result.stdid and stdinfo.class=$class order by $result.per DESC LIMIT 0,10");
+$i=0;
+while($data=mysql_fetch_object($ss))
+{
+$x[$i]['name']=$data->name;
+$x[$i++]['per']=$data->per;
+}
+return $x;
+}
+?>

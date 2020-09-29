@@ -1,0 +1,1590 @@
+@extends('layouts.admin_layout')
+@section('headerContent')
+    <link rel="stylesheet" href="{{asset('public/admin/plugin/select2/css/select2.min.css')}}" type="text/css"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@stop
+@section('content')
+    <div class="container-fluid" data-appear-animation="fadeInLeft" data-appear-delay="400">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb" data-appear-animation="fadeInRight" data-appear-delay="600">
+                    <li><a href="{{route('home')}}"><span class="glyphicon glyphicon-blackboard"></span> Dashboard</a>
+                    </li>
+                    <li><a href="{{route('project.index')}}"><i class="fa fa-buysellads"></i> Projects</a></li>
+                    <li class="active"><a href="{{route('project.show',$project->slug)}}"><i class="fa fa-edit"></i> {{$project->title}}</a></li>
+                </ol>
+                <div class="pro_helpers" data-appear-animation="fadeInDown" data-appear-delay="800">
+                    <div class="col-lg-6 col-md-6">
+                        <a href="{{route('project.index')}}/search?search={{ $project->project_code}}" class="btn btn-warning showToolTip"
+                           title="Back To Index" role="button" data-placement="top"><span
+                                    class="glyphicon glyphicon-chevron-left"></span><span class="hidden-xs hidden-sm"> Back</span></a>
+                        <a href="{{route('project.index')}}" class="btn btn-info showToolTip"
+                           title="View All Projects" role="button" data-placement="top"><span
+                                    class="glyphicon glyphicon-eye-open"></span> <span class="hidden-xs hidden-sm">Projects</span></a>
+                    </div>
+                    <dv class="col-md-1 col-lg-1 pull-right">
+                        <a class="btn btn-xs btn-primary" title="Logs" href="{{ route('projectLogs',$project->id) }}"><span class="fa fa fa-th-list"></span> View Log</a>
+                    </dv>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="pro_content" data-appear-animation="fadeInUp" data-appear-delay="1000">
+                    <div class="col-md-8 col-lg-8">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span>
+                                    Project</h3>
+                                {!! minimizeButton('pro_collapse_implementingoffice_save') !!}
+                            </div>
+                            <div class="panel-body collapse in" id="pro_collapse_implementingoffice_save">
+                                <h1>{{$project->name}}</h1>
+                                <h2>{{ $project->project_code}}</h2>
+                                <p>कार्यान्वयन निकाय: <a
+                                            href="{{route('implementingoffice.show',$project->implementing_office_id)}}"><strong>{{$project->implementing_office->name}}</strong></a>
+                                </p>
+                                <?php
+                                $show=false;
+                                if($project->procurement->Contractor!=null){
+                                    $contractor=$project->procurement->Contractor->name;
+                                    $route="contractor.show";
+                                    $slug=$project->procurement->Contractor->slug;
+                                    $show=true;
+                                }
+                                if($project->procurement->JointVenture!=null){
+                                    $contractor=$project->procurement->JointVenture->name;
+                                    $route="joint_venture.edit";
+                                    $slug=$project->procurement->JointVenture->slug;
+                                    $show=true;
+                                }
+                                ?>
+                                @if($show)<p>निर्माण ब्यबसाई: <a href="{{route($route,$slug)}}"><strong>{{$contractor}}</strong></a>@endif
+                                </p>
+                                <div class="clearfix"></div>
+                                <hr>
+                                <p>
+                                    {!! nl2br($project->description) !!}
+                                </p>
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span> निकाशा
+                                    तथा खर्चको विवरण</h3>
+                                {!! minimizeButton('pro_collapse_peski_nikasa') !!}
+                            </div>
+                            <div class="panel-body collapse" id="pro_collapse_peski_nikasa">
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span>
+                                    कार्यक्रमसंग सम्बन्धित कागजात/गतिविधिहरु</h3>
+                                <?php
+                                    $officersPapers=$project->activityLogs()->whereHas('creator',function($creator){
+                                        $creator->doesntHave("Contractor");
+                                    });
+                                ?>
+                            @if($officersPapers->count()>0)
+                                    {!! minimizeButton('pro_collapse_docs') !!}
+                                @else
+                                    <div class="clearfix"></div>
+                                @endif
+                            </div>
+                            <div class="panel-body collapse" id="pro_collapse_docs">
+                                <table class="table table-bordered table-striped table-hover">
+                                    @foreach($officersPapers->get()->sortByDesc('submitted_date') as $activity)
+                                        <tr class="papers" data-type="{{ $activity->type }}" data-id="{{$activity->id}}">
+                                            <td style="width:15%;vertical-align: middle;text-align:center;">
+                                                <strong>{{dateBS($activity->submitted_date)}}</strong>
+                                            </td>
+                                            <td>
+                                                <h4>
+                                                    <div class="row">
+                                                        <div class="papertitle col-lg-10 col-md-10">
+                                                            {{$activity->title}}
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-2 text-right">
+                                                            <a class="deleteActivityLogs showToolTip confirmButton" href="" title="Move to Trash" data-placement="top" data-form-id="pro_my_form{{$activity->id}}"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;
+                                                            {!! delete_form(['delete.old.activity_log',$activity->id], 'pro_my_form'.$activity->id) !!}
+                                                        </div>
+                                                    </div>
+                                                </h4>
+                                                <hr>
+                                                <p>{{$activity->description}}</p>
+                                                @foreach($activity->ActivityLogFiles as $file)
+                                                    @if(strrchr($file->file_path,'.') == '.pdf')
+                                                        <a class="btn btn-danger" target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$file->file_path)}}">
+                                                            <i class="fa fa-file-pdf-o"></i> View PDF File
+                                                        </a>
+                                                    @else
+                                                        <a target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$file->file_path)}}">
+                                                            <img src="{{asset('public/activityFiles/'.$file->file_path)}}"
+                                                                 alt="Image" class="img-thumbnail" style="width: 25%">
+                                                        </a>
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home"></span>
+                                    निर्माण ब्यवसाइ सम्बन्धित कागजात/गतिविधिहरु</h3>
+
+                                <?php
+
+                                    $contractorPapers=$project->activityLogs()->whereHas('creator',function($creator){
+                                        $creator->has("Contractor");
+                                    });
+
+                                ?>
+                                @if($contractorPapers->count()>0)
+                                    {!! minimizeButton('pro_collapse_docs_contractor') !!}
+                                @else
+                                    <div class="clearfix"></div>
+                                @endif
+                            </div>
+                            <div class="panel-body collapse" id="pro_collapse_docs_contractor">
+                                <table class="table table-bordered table-striped table-hover">
+                                    @foreach($contractorPapers->get()->sortByDesc('submitted_date') as $activity)
+                                        <tr class="papers" data-type="{{ $activity->type }}" data-id="{{$activity->id}}">
+                                            <td style="width:15%;vertical-align: middle;text-align:center;">
+                                                <strong>{{dateBS($activity->submitted_date)}}</strong>
+                                            </td>
+                                            <td>
+                                                <h4>
+                                                    <div class="row">
+                                                        <div class="papertitle col-lg-10 col-md-10">
+                                                            {{$activity->title}}
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-2 text-right">
+                                                            <a class="deleteActivityLogs showToolTip confirmButton" href="" title="Move to Trash" data-placement="top" data-form-id="pro_my_form{{$activity->id}}"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;
+                                                            {!! delete_form(['delete.old.activity_log',$activity->id], 'pro_my_form'.$activity->id) !!}
+                                                        </div>
+                                                    </div>
+                                                </h4>
+                                                <hr>
+                                                <p>{{$activity->description}}</p>
+                                                @foreach($activity->ActivityLogFiles as $file)
+                                                    @if(strrchr($file->file_path,'.') == '.pdf')
+                                                        <a class="btn btn-danger" target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$file->file_path)}}">
+                                                            <i class="fa fa-file-pdf-o"></i> View PDF File
+                                                        </a>
+                                                    @else
+                                                        <a target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$file->file_path)}}">
+                                                            <img src="{{asset('public/activityFiles/'.$file->file_path)}}"
+                                                                 alt="Image" class="img-thumbnail" style="width: 25%">
+                                                        </a>
+                                                    @endif
+
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span>
+                                    म्याद थप मितिहरु</h3>
+                                @if(count($project->TimeExtension)>0)
+                                    {!! minimizeButton('pro_collapse_mayd_thap_haru') !!}
+                                @else
+                                    <div class="clearfix"></div>
+                                @endif
+                            </div>
+                            <div class="panel-body collapse @if(session()->has('variation_session')) in @endif " id="pro_collapse_mayd_thap_haru">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <tr>
+                                        <th width="10%">देखी</th>
+                                        <th width="10%">सम्म</th>
+                                        <th width="10%">निर्णय मिति</th>
+                                        <th width="10%">कहाँबाट भएको</th>
+                                        <th width="10%">हर्जाना लागेको छ/छैन</th>
+                                        <th width="50%">कैफियत</th>
+                                        <th width="50%">कागजात</th>
+                                    </tr>
+                                    @foreach($project->TimeExtension->sortByDesc('start_date') as $extension)
+                                        <tr class='timeextension' id="timeextension" data-id="{{$extension->id}}">
+                                            <td data-id="{{$extension->liquidated_damage}}">{{ $extension->start_date }}</td>
+                                            <td>{{ $extension->end_date }}</td>
+                                            <td>{{ $extension->extended_on }}</td>
+                                            <td data-id="{{$extension->verified_from}}">{{ verifiedFrom()[$extension->verified_from ]}}</td>
+                                            <td>  {{ $extension->liquidated_damage==1?"छ":"छैन" }}
+                                            </td>
+                                            <td>{{ $extension->remarks }}</td>
+                                            <td>
+                                                @if($extension->file)
+                                                    @if(strrchr($extension->file,'.') == '.pdf')
+                                                        <a class="btn btn-danger" target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$extension->file)}}">
+                                                            <i class="fa fa-file-pdf-o"></i> View PDF File
+                                                        </a>
+                                                    @else
+                                                        <a target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$extension->file)}}">
+                                                            <img src="{{asset('public/activityFiles/'.$extension->file)}}"
+                                                                 alt="Image" class="img-thumbnail" style="width: 100px">
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span>VO/PA/Bonus</h3>
+                                @if(count($project->variation)>0)
+                                    {!! minimizeButton('pro_collapse_vopes') !!}
+                                @else
+                                    <div class="clearfix"></div>
+                                @endif
+                            </div>
+                            <div class="panel-body collapse" style="position: relative; top:0; right:0;" id="pro_collapse_vopes">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <tr>
+                                        <th width="10%">VO/PA/Bonus Date</th>
+                                        <th width="10%">Choosen</th>
+                                        <th width="10%">VO/PE/Bonus कहाँ बाट भएको</th>
+                                        <th width="10%">VO/PE/Bonus Amount</th>
+                                        <th width="60%">कैफियत</th>
+                                        <th width="60%">कागजात</th>
+                                    </tr>
+                                    <?php
+                                        $variations_choose=array('Variation','Price Escalation','Bonus');
+                                    ?>
+                                    @foreach($project->variation->sortByDesc('id') as $variation)
+                                        <tr class='assets' id="assets" data-id="{{$variation->id}}">
+                                            <td>{{ $variation->vope_date }}</td>
+                                            <td class="status_" data-id="{{$variation->status}}">{{ $variations_choose[$variation->status]}}</td>
+                                            <td class="verified_from" data-id="{{$variation->verified_from}}">{{ verifiedFrom()[$variation->verified_from]}}</td>
+                                            <td>{{ $variation->amount }}</td>
+                                            <td class="remarks">{{ $variation->remarks }}</td>
+                                            <td>
+                                                @if($variation->file)
+                                                    @if(strrchr($variation->file,'.') == '.pdf')
+                                                        <a class="btn btn-danger" target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$variation->file)}}">
+                                                            <i class="fa fa-file-pdf-o"></i> View PDF File
+                                                        </a>
+                                                    @else
+                                                        <a target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$variation->file)}}">
+                                                            <img src="{{asset('public/activityFiles/'.$variation->file)}}"
+                                                                 alt="Image" class="img-thumbnail" style="width: 100px">
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span>
+                                    हर्जनाहरु</h3>
+                                @if(count($project->liquidation)>0)
+                                    {!! minimizeButton('pro_collapse_liquidation') !!}
+                                @else
+                                    <div class="clearfix"></div>
+                                @endif
+                            </div>
+                            <div class="panel-body collapse" style="position: relative; top:0; right:0;" id="pro_collapse_liquidation">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <tr>
+                                        <th>Amount</th>
+                                        <th>Collected Date</th>
+                                        <th>Remarks</th>
+                                        <th>कागजात</th>
+                                    </tr>
+                                    @foreach($project->liquidation->sortByDesc('id') as $liquidation)
+                                        <tr class="liquidation_damages" data-id="{{ $liquidation->id }}">
+                                            <td>{{ $liquidation->amount }}</td>
+                                            <td>{{ $liquidation->collected_date }}</td>
+                                            <td>{{ $liquidation->remarks }}</td>
+                                            <td>
+                                                @if($liquidation->file)
+                                                    @if(strrchr($liquidation->file,'.') == '.pdf')
+                                                        <a class="btn btn-danger" target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$liquidation->file)}}">
+                                                            <i class="fa fa-file-pdf-o"></i> View PDF File
+                                                        </a>
+                                                    @else
+                                                        <a target="_blank" title="Click to view file"
+                                                           href="{{asset('public/activityFiles/'.$liquidation->file)}}">
+                                                            <img src="{{asset('public/activityFiles/'.$liquidation->file)}}"
+                                                                 alt="Image" class="img-thumbnail" style="width: 100px">
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-home "></span>
+                                    Procurement Dates</h3>
+                                @if(count($project->ProcurementDates)>0)
+                                    {!! minimizeButton('pro_procurement_date_list') !!}
+                                @else
+                                    <div class="clearfix"></div>
+                                @endif
+                            </div>
+                            <div class="panel-body collapse" style="position: relative; top:0; right:0;" id="pro_procurement_date_list">
+                                <table class="table table-striped">
+                                            <tr>
+                                                <th>Bank/Insurance Company Name</th>
+                                                <th>Bank/Insurance Company Branch</th>
+                                                <th>Amount</th>
+                                                <th>Type</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        @foreach($project->ProcurementDates as $index=>$procurementDate)
+                                            <tr>
+                                                <td>
+                                                    {{ $procurementDate->company_name }}
+                                                </td>
+                                                <td>
+                                                    {{ $procurementDate->company_branch }}
+                                                </td>
+                                                <td>
+                                                    {{ $procurementDate->amount }}
+                                                </td>
+                                                <td>
+                                                    {{ procurementDates()[$procurementDate->type]}}
+                                                </td>
+                                                <td>
+                                                    {{ $procurementDate->start_date }}
+                                                </td>
+                                                <td>
+                                                    {{ $procurementDate->end_date }}
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('procurement_date.edit',$procurementDate->id) }}" class="btn btn-xs btn-info">Edit</a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4 pro_content_right" data-appear-animation="fadeInRight"
+                         data-appear-delay="1200">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> Activity Log</h3>
+                                {!! minimizeButton('pro_collapse_a_log') !!}
+                            </div>
+                            <div class="panel-body collapse" id="pro_collapse_a_log">
+                            {!!Form::open(['route'=>['project.upload.log'],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                                    <!-- title -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('title')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('title','Title:') !!}
+                                        {!! Form::text('title', null, ['class'=>'form-control']) !!}
+                                        {!! Form::hidden('project_id', $project->id) !!}
+                                        @if($errors->has('title'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('title') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('title')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('type','Type:') !!}
+                                        <br/>
+                                        {!! Form::Select('type',progressActivityLogsTypes()['project'],null) !!}
+                                    </div>
+                                </div>
+                                <!-- description -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('description')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('description','Description:') !!}
+                                        {!! Form::textarea('description', null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('description'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small>
+                                                    <i class="fa fa-warning"></i> {!! $errors->first('description') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- date -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('date','Date:') !!}
+                                        <input type="text" class="form-control" name="date" id="date"
+                                               value="{{str_replace('/','-',dateBS(date('Y-m-d')))}}">
+                                        @if($errors->has('date'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="dateStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('date') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="dateStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- file -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('file')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('file','File:') !!}
+                                        {!! Form::file('file[]', ['class'=>'form-control','multiple'=>true]) !!}
+                                        @if($errors->has('file'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="fileStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('file') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="fileStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> म्याद थप मिति</h3>
+                                {!! minimizeButton('pro_collapse_time_ext') !!}
+                            </div>
+                            <div class="panel-body collapse @if($errors->has('start_date') || $errors->has('start_date') || $errors->has('fine') || $errors->has('remarks')) in @endif" id="pro_collapse_time_ext">
+                                {!!Form::open(['route'=>['project.extension.time',$project->id],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                                <!-- title -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('title')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('start_date','देखि :') !!}
+                                        {!! Form::text('start_date', old('start_date'),['class'=>"form-control nepaliDate",'placeholder'=>'Start Date']) !!}
+                                        @if($errors->has('start_date'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small>
+                                                    <i class="fa fa-warning"></i> {!! $errors->first('start_date') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titlestart_date" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('end_date','सम्म:') !!}
+                                        {!! Form::text('end_date', old('end_date'),['class'=>"form-control nepaliDate",'placeholder'=>'End Date']) !!}
+                                        @if($errors->has('end_date'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('end_date') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleEnd_date" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                    <!-- liquidated_damage -->
+                                    <div class="form-group col-md-6 col-lg-6 @if($errors->has('liquidated_damage')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip" @if($errors->has('liquidated_damage')) title="{!!$errors->first('liquidated_damage')!!}" @endif>
+                                            {!! Form::label('liquidated_damage','हर्जाना लागेको/नलागेको') !!}
+                                            <br>{!! Form::radio('liquidated_damage', '0',true) !!} No
+                                            {!! Form::radio('liquidated_damage', '1') !!} Yes
+                                            @if($errors->has('liquidated_damage'))
+                                                <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="liquidated_damageStatus" class="sr-only">(error)</span>
+                                            @elseif(count($errors->all())>0)
+                                                <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="liquidated_damageStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <!-- verified_from -->
+                                    <div class="input-group pro_make_full showToolTip">
+                                        <div class="input-group pro_make_full showToolTip" @if($errors->has('verified_from')) title="{!!$errors->first('verified_from')!!}" @endif>
+                                            {!! Form::label('verified_from','म्याद थप कहाँबाट भएको') !!}
+                                            {!! Form::select('verified_from', verifiedFrom(), getProjectStatus()[$project->project_status], ['class'=>'form-control']) !!}
+                                            @if($errors->has('verified_from'))
+                                                <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="verified_fromStatus" class="sr-only">(error)</span>
+                                            @elseif(count($errors->all())>0)
+                                                <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="verified_fromStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- description -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('remarks')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('Remarks','कैफियत:') !!}
+                                        {!! Form::textarea('remarks', old('remarks'), ['class'=>'form-control']) !!}
+                                        @if($errors->has('remarks'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('remarks') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- date -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('extended_on')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('title','म्याद थप भएको मिति :') !!}
+                                        {!! Form::text('extended_on', old('extended_on'),['class'=>"form-control nepaliDate",'placeholder'=>'म्याद थप भएको मिति','id'=>'extended_on']) !!}
+                                        @if($errors->has('extended_on'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small>
+                                                    <i class="fa fa-warning"></i> {!! $errors->first('extended_on') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="titleStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                    <hr>
+                                    {!! Form::file('file') !!} For Multiple Files, Convert them as single pdf.
+                                </div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> VO/PE/Bonus</h3>
+                                {!! minimizeButton('pro_collapse_vope') !!}
+                            </div>
+                            {!!Form::open(['route'=>['project.variation.add',$project->id],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                            <div class="panel-body collapse" id="pro_collapse_vope">
+                                <!-- vope_date -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('vope_date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip"
+                                         @if($errors->has('vope_date')) title="{!!$errors->first('vope_date')!!}" @endif>
+                                        {!! Form::label('vope_date','VO/PE/Bonus Date') !!}
+                                        {!! Form::text('vope_date', null, ['class'=>'form-control nepaliDate','required'=>'required']) !!}
+                                        @if($errors->has('vope_date'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="vope_dateStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="vope_dateStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- contract_amount -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('contract_amount')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip"
+                                         @if($errors->has('contract_amount')) title="{!!$errors->first('contract_amount')!!}" @endif>
+                                        {!! Form::label('contract_amount','Contract amount') !!}
+                                        {!! Form::text('contract_amount', $project->procurement->contract_amount, ['class'=>'form-control','required'=>'required','disabled'=>'disabled']) !!}
+                                        @if($errors->has('contract_amount'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                             <span id="contract_amountStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="contract_amountStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- status -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('status')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip"
+                                         @if($errors->has('status')) title="{!!$errors->first('status')!!}" @endif>
+                                        {!! Form::label('status','Choose: ') !!} <span class="bonusMessage text-danger" >१३% VAT & Contengency बाहेक</span>
+                                        {!! Form::select('status', array('Variation','Price Escalation','Bonus'),null, ['class'=>'form-control','required'=>'required']) !!}
+                                        @if($errors->has('status'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="statusStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="statusStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- amount -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('amount')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip"
+                                         @if($errors->has('amount')) title="{!!$errors->first('amount')!!}" @endif>
+                                        {!! Form::label('amount','VO/PE/Bonus Amount') !!}
+                                        {!! Form::text('amount', null, ['class'=>'form-control','required'=>'required']) !!}
+                                        @if($errors->has('amount'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="amountStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="amountStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- verified_from -->
+                                <div class="form-group col-md-12 col-lg-12 pro_make_full showToolTip">
+                                    <div class="input-group pro_make_full showToolTip" @if($errors->has('verified_from')) title="{!!$errors->first('verified_from')!!}" @endif>
+                                        {!! Form::label('verified_from','कहाँबाट भएको') !!}
+                                        {!! Form::select('verified_from', verifiedFrom(), getProjectStatus()[$project->project_status], ['class'=>'form-control']) !!}
+                                        @if($errors->has('verified_from'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="verified_fromStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="verified_fromStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- description -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('remarks')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('Remarks','कैफियत:') !!}
+                                        {!! Form::textarea('remarks', null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('remarks'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('remarks') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                    <hr>
+                                    {!! Form::file('file') !!} For Multiple Files, Convert them as single pdf.
+                                </div>
+                                <div class="clearix"></div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> हर्जाना</h3>
+                                {!! minimizeButton('pro_collapse_liquidation_collect') !!}
+                            </div>
+                            {!!Form::open(['route'=>['project.liquidation.add',$project->id],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                            <div class="panel-body collapse" id="pro_collapse_liquidation_collect">
+                                <!-- vope_date -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('amount')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip"
+                                         @if($errors->has('amount')) title="{!!$errors->first('amount')!!}" @endif>
+                                        {!! Form::label('amount','Amount') !!}
+                                        {!! Form::text('amount', null, ['class'=>'form-control','required'=>'required']) !!}
+                                        @if($errors->has('amount'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="amountStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="amountStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- collected_date -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('collected_date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip"
+                                         @if($errors->has('collected_date')) title="{!!$errors->first('collected_date')!!}" @endif>
+                                        {!! Form::label('collected_date','Collected Date') !!}
+                                        {!! Form::text('collected_date', null, ['class'=>'form-control nepaliDate','required'=>'required']) !!}
+                                        @if($errors->has('collected_date'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="collected_dateStatus" class="sr-only">(error)</span>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="collected_dateStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- description -->
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('remarks')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('Remarks','कैफियत:') !!}
+                                        {!! Form::textarea('remarks', null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('remarks'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger">
+                                                <small><i class="fa fa-warning"></i> {!! $errors->first('remarks') !!}
+                                                </small>
+                                            </div>
+                                        @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                  aria-hidden="true"></span>
+                                            <span id="descriptionStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                    <hr>
+                                    {!! Form::file('file') !!} For Multiple Files, Convert them as single pdf.
+                                </div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                        <?php
+                        $receiverId='';
+                        $notification=false;
+                        $receiver='single';
+                            if($project->procurement->Contractor){
+                                $notification=true;
+                                $receiverId=$project->procurement->Contractor->myUser->id;
+                            }
+                            if($project->procurement->JointVenture){
+                                $receiver='multiple';
+                                $notification=true;
+                                foreach($project->procurement->JointVenture->contractors as $contractor){
+                                    $receiverId.=$contractor->myUser->id.',';
+                                }
+                            }
+
+                        ?>
+                        @if($notification)
+                        <div class="pro_content_right" data-appear-animation="fadeInRight"
+                             data-appear-delay="1200">
+                            <div class="panel panel-default">
+                                {!!Form::open(['route'=>'notice.store','method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                                <div class="panel-heading">
+                                    <h3 class="panel-title pull-left"><span class="glyphicon glyphicon-globe"></span>
+                                        Send Notification</h3>
+                                    {!! minimizeButton('pro_collapse_contractor_save') !!}
+                                </div>
+                                <div class="panel-body collapse" id="pro_collapse_contractor_save">
+                                    <!-- title -->
+                                    <div class="form-group col-md-12 col-lg-12 @if($errors->has('name')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip" @if($errors->has('name')) title="{!!$errors->first('name')!!}" @endif>
+                                            {!! Form::label('name','Name:') !!}
+                                            {!! Form::text('name', null, ['class'=>'form-control firstInput','required'=>'required']) !!}
+                                            @if($errors->has('name'))
+                                                <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="nameStatus" class="sr-only">(error)</span>
+                                            @elseif(count($errors->all())>0)
+                                                <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="nameStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12 col-lg-12 @if($errors->has('description')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip" @if($errors->has('description')) title="{!!$errors->first('description')!!}" @endif>
+                                            {!! Form::label('description','Description:') !!}
+                                            {!! Form::textarea('description', null, ['class'=>'form-control ckeditor', 'rows'=>9]) !!}
+                                            @if($errors->has('description'))
+                                                <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="descriptionStatus" class="sr-only">(error)</span>
+                                            @elseif(count($errors->all())>0)
+                                                <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                <span id="descriptionStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="listener" value="contractor" id="contractor"/>
+                                    <input type="hidden" name="@if($receiver='multiple') listeners_id @else listener_id @endif" value="{{ $receiverId }}" id="contractor"/>
+                                    <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                        Save
+                                    </button>
+                                    <button class="btn btn-default" type="reset">Reset</button>
+                                </div>
+                                {!! Form::close() !!}
+                            </div>
+                        </div>
+                        @endif
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> Procurement Date</h3>
+                                {!! minimizeButton('pro_procurement_dates') !!}
+                            </div>
+                            {!!Form::open(['route'=>['project.procurement_date.add', $project->id],'method'=>'POST','class'=>'showSavingOnSubmit','files'=>true])!!}
+                            <div class="panel-body collapse" id="pro_procurement_dates">
+                                <!-- start_date -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('start_date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('start_date','Start Date') !!}
+                                        {!! Form::text('start_date', null, ['id'=>'procurement_start_date','class'=>'form-control nepaliDate']) !!}
+                                        @if($errors->has('start_date'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="start_dateStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('start_date') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="start_dateStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- end_date -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('end_date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('end_date','End Date') !!}
+                                        {!! Form::text('end_date', null, ['id'=>'procurement_end_date','class'=>'form-control nepaliDate']) !!}
+                                        @if($errors->has('end_date'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="end_dateStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('end_date') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="end_dateStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <!-- type -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('type')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('type','Type') !!}
+                                        {!! Form::select('type', procurementDates(),null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('type'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="typeStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('type') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="typeStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- amount -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('amount')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('amount','Amount') !!}
+                                        {!! Form::text('amount', null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('amount'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="amountStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('amount') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="amountStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                <!-- company_name -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('company_name')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('company_name','Bank/Insurance Company Name') !!}
+                                        {!! Form::text('company_name', null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('company_name'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="company_nameStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('company_name') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="company_nameStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- company_branch -->
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('company_branch')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('company_branch','Bank/Insurance Company Branch') !!}
+                                        {!! Form::text('company_branch', null, ['class'=>'form-control']) !!}
+                                        @if($errors->has('company_branch'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="company_branchStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('company_branch') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="company_branchStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12 col-lg-12">
+                                    <hr>
+                                    {!! Form::file('file') !!} For Multiple Files, Convert them as single pdf.
+                                </div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> Authorized Persons</h3>
+                                {!! minimizeButton('pro_project_authorized_person') !!}
+                            </div>
+                            {!!Form::open(['route'=>['project.authorized_person.add', $project->id],'method'=>'POST','class'=>'showSavingOnSubmit'])!!}
+                            <div class="panel-body collapse" id="pro_project_authorized_person">
+                                <!-- authorizedPersons -->
+                                <?php
+                                $selected=$project->authorizedPersons->pluck('id')->toArray();
+
+                                $authorizedPersons=array();
+                                    if($project->procurement->Contractor){
+                                        $authorizedPersons=$project->procurement->Contractor->authorizedPerson->pluck('name','id');
+                                    }elseif($project->procurement->JointVenture){
+                                        foreach ($project->procurement->JointVenture->contractors as $contractor){
+                                            foreach($contractor->authorizedPerson as $authorizedPerson){
+                                                $authorizedPersons[$authorizedPerson->id]=$authorizedPerson->name;
+                                            }
+                                        }
+                                    }
+                                ?>
+                                <div class="form-group col-md-12 col-lg-12 @if($errors->has('authorizedPersons')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('authorizedPersons','Authorized Person') !!}
+                                        {!! Form::select('authorizedPersons[]', $authorizedPersons ,$selected, ['class'=>'form-control','multiple'=>'multiple']) !!}
+                                        @if($errors->has('authorizedPersons'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="authorizedPersonsStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('authorizedPersons') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="authorizedPersonsStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title pull-left"><i class="fa fa-file"></i> Engineers</h3>
+                                {!! minimizeButton('pro_project_engineers') !!}
+                            </div>
+                            {!!Form::open(['route'=>['project.engineers.add', $project->id],'method'=>'POST','class'=>'showSavingOnSubmit'])!!}
+                            <div class="panel-body collapse" id="pro_project_engineers">
+                                <!-- engineers -->
+                                <?php $selectedEngineers=$project->Engineers()->where('type','Engineer')->get();
+                                      $selectedEngineers=$selectedEngineers->pluck('id')->toArray();
+                                ?>
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('engineers')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('engineers','Engineers') !!}
+                                        {!! Form::select('engineers[]', $engineers ,$selectedEngineers, ['class'=>'form-control','multiple'=>'multiple']) !!}
+                                        @if($errors->has('engineers'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="engineersStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('engineers') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="engineersStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- sub_engineers -->
+                                <?php $selectedSubEngineers=$project->Engineers()->where('type','Sub Engineer')->get();
+                                        $selectedSubEngineers=$selectedSubEngineers->pluck('id')->toArray();
+                                ?>
+                                <div class="form-group col-md-6 col-lg-6 @if($errors->has('sub_engineers')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                    <div class="input-group pro_make_full showToolTip">
+                                        {!! Form::label('sub_engineers','Sub Engineers') !!}
+                                        {!! Form::select('sub_engineers[]',$sub_engineer ,$selectedSubEngineers, ['class'=>'form-control','multiple'=>'multiple']) !!}
+                                        @if($errors->has('sub_engineers'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="sub_engineersStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('sub_engineers') !!}</small></div>
+                                        @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                        <span id="sub_engineersStatus" class="sr-only">(success)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">
+                                    Upload
+                                </button>
+                                <button class="btn btn-default" type="reset">Reset</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+
+                        {{--<div class="panel panel-default">--}}
+                            {{--<div class="panel-footer">--}}
+                                {{--<button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">Save--}}
+                                {{--</button>--}}
+                                {{--<button class="btn btn-default" type="reset">Reset</button>--}}
+                            {{--</div>--}}
+                        {{--</div>--}}
+                    </div>
+                    {!! Form::close() !!}
+                    <div class="clearfix"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="variationModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Update Variaion</h4>
+                </div>
+                <div class="modal-body">
+                    {!!Form::open(['route'=>['update.old.variation'],'method'=>'post','class'=>'showSavingOnSubmit','id'=>'variation_update','files'=>true])!!}
+                        <!-- vope_date -->
+                        <div class="form-group col-md-12 col-lg-12 @if($errors->has('vope_date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                            <div class="input-group pro_make_full showToolTip"
+                                 @if($errors->has('vope_date')) title="{!!$errors->first('vope_date')!!}" @endif>
+                                {!! Form::label('vope_date','VO/PE Date') !!}
+                                {!! Form::text('vope_date', null, ['id'=>'vope_date_update','class'=>'form-control nepaliDate','required'=>'required']) !!}
+                                {!! Form::hidden('variationId', null,['id'=>'variation_update_id']) !!}
+                                @if($errors->has('vope_date'))
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="vope_dateStatus" class="sr-only">(error)</span>
+                                @elseif(count($errors->all())>0)
+                                    <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="vope_dateStatus" class="sr-only">(success)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <!-- status -->
+                        <div class="form-group col-md-12 col-lg-12 @if($errors->has('status')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                            <div class="input-group pro_make_full showToolTip"
+                                 @if($errors->has('status')) title="{!!$errors->first('status')!!}" @endif>
+                                {!! Form::label('status','Choose: ') !!}<span class="text-danger bonusMessage" >१३% VAT & Contengency बाहेक</span>
+                                {!! Form::select('status', array('Variation','Price Escalation','Bonus'),null, ['id'=>'statusUpdate','class'=>'form-control','required'=>'required']) !!}
+                                @if($errors->has('status'))
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="statusStatus" class="sr-only">(error)</span>
+                                @elseif(count($errors->all())>0)
+                                    <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="statusStatus" class="sr-only">(success)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <!-- amount -->
+                        <div class="form-group col-md-12 col-lg-12 @if($errors->has('amount')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                            <div class="input-group pro_make_full showToolTip"
+                                 @if($errors->has('amount')) title="{!!$errors->first('amount')!!}" @endif>
+                                {!! Form::label('amount','VO/PA/Bonus') !!}
+                                {!! Form::text('amount', null, ['id'=>'amountUpdate','class'=>'form-control','required'=>'required']) !!}
+                                @if($errors->has('amount'))
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="amountStatus" class="sr-only">(error)</span>
+                                @elseif(count($errors->all())>0)
+                                    <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="amountStatus" class="sr-only">(success)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <!-- verified_from -->
+                        <div class="form-group col-md-12 col-lg-12 pro_make_full showToolTip">
+                            <div class="input-group pro_make_full showToolTip" @if($errors->has('verified_from')) title="{!!$errors->first('verified_from')!!}" @endif>
+                                {!! Form::label('verified_from','कहाँबाट भएको') !!}
+                                {!! Form::select('verified_from', verifiedFrom(), getProjectStatus()[$project->project_status], ['id'=>'verified_fromUpdate','class'=>'form-control']) !!}
+                                @if($errors->has('verified_from'))
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                    <span id="verified_fromStatus" class="sr-only">(error)</span>
+                                @elseif(count($errors->all())>0)
+                                    <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                    <span id="verified_fromStatus" class="sr-only">(success)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            {!! Form::checkbox('remove_current_file', '0',false) !!} Remove Current File
+                        </div>
+                        <div class="col-md-6">
+                            {!! Form::file('file') !!}New file (Optional)
+                        </div>
+                        <!-- description -->
+                        <div class="form-group col-md-12 col-lg-12 @if($errors->has('remarks')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                            <div class="input-group pro_make_full showToolTip">
+                                {!! Form::label('Remarks','कैफियत:') !!}
+                                {!! Form::textarea('remarks', null, ['id'=>'remarksUpdate','class'=>'form-control']) !!}
+                                @if($errors->has('remarks'))
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="descriptionStatus" class="sr-only">(error)</span>
+                                    <div class="alert alert-danger">
+                                        <small><i class="fa fa-warning"></i> {!! $errors->first('remarks') !!}
+                                        </small>
+                                    </div>
+                                @elseif(count($errors->all())>0)
+                                    <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                          aria-hidden="true"></span>
+                                    <span id="descriptionStatus" class="sr-only">(success)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">Save
+                        </button>
+                    {!! Form::close() !!}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="timeExtensionModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Update Time Extension</h4>
+                </div>
+                <div class="modal-body">
+                        {!!Form::open(['route'=>['update.old.time_extension'],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                        <!-- title -->
+                            <div class="form-group col-md-12 col-lg-12 @if($errors->has('title')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            {!! Form::hidden('extensionId', null,['id'=>'extensionId_update']) !!}
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    {!! Form::label('start_date','देखि :') !!}
+                                                </div>
+                                                <div class="col-md-9">
+                                                    {!! Form::text('start_date', old('start_date'),['id'=>'start_date_update','class'=>"form-control nepaliDate",'placeholder'=>'Start Date']) !!}
+                                                    @if($errors->has('start_date'))
+                                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                              aria-hidden="true"></span>
+                                                        <span id="titleStatus" class="sr-only">(error)</span>
+                                                        <div class="alert alert-danger">
+                                                            <small>
+                                                                <i class="fa fa-warning"></i> {!! $errors->first('start_date') !!}
+                                                            </small>
+                                                        </div>
+                                                    @elseif(count($errors->all())>0)
+                                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                              aria-hidden="true"></span>
+                                                        <span id="titlestart_date" class="sr-only">(success)</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    {!! Form::label('end_date','सम्म:') !!}
+                                                </div>
+                                                <div class="col-md-9">
+                                                    {!! Form::text('end_date', old('end_date'),['id'=>'end_date_update','class'=>"form-control nepaliDate",'placeholder'=>'End Date']) !!}
+                                                    @if($errors->has('end_date'))
+                                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                              aria-hidden="true"></span>
+                                                        <span id="titleStatus" class="sr-only">(error)</span>
+                                                        <div class="alert alert-danger">
+                                                            <small><i class="fa fa-warning"></i> {!! $errors->first('end_date') !!}
+                                                            </small>
+                                                        </div>
+                                                    @elseif(count($errors->all())>0)
+                                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                              aria-hidden="true"></span>
+                                                        <span id="titleEnd_date" class="sr-only">(success)</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            <div class="input-group pro_make_full showToolTip" @if($errors->has('verified_from')) title="{!!$errors->first('verified_from')!!}" @endif>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        {!! Form::label('verified_from','म्याद थप कहाँबाट भएको:') !!}
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        {!! Form::select('verified_from', verifiedFrom(), null, ['id'=>'verified_from_update_extend','class'=>'form-control']) !!}
+                                                        @if($errors->has('verified_from'))
+                                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                            <span id="verified_fromStatus" class="sr-only">(error)</span>
+                                                        @elseif(count($errors->all())>0)
+                                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                            <span id="verified_fromStatus" class="sr-only">(success)</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group @if($errors->has('extended_on')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                            <div class="input-group pro_make_full showToolTip">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        {!! Form::label('title','म्याद थप भएको मिति :') !!}
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        {!! Form::text('extended_on', old('extended_on'),['id'=>'extended_on_update','class'=>"form-control nepaliDate",'placeholder'=>'म्याद थप भएको मिति']) !!}
+                                                        @if($errors->has('extended_on'))
+                                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                                  aria-hidden="true"></span>
+                                                            <span id="titleStatus" class="sr-only">(error)</span>
+                                                            <div class="alert alert-danger">
+                                                                <small>
+                                                                    <i class="fa fa-warning"></i> {!! $errors->first('extended_on') !!}
+                                                                </small>
+                                                            </div>
+                                                        @elseif(count($errors->all())>0)
+                                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                                  aria-hidden="true"></span>
+                                                            <span id="titleStatus" class="sr-only">(success)</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-12 col-lg-12 @if($errors->has('liquidated_damage')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip" @if($errors->has('liquidated_damage')) title="{!!$errors->first('liquidated_damage')!!}" @endif>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    {!! Form::label('liquidated_damage','हर्जाना लागेको/नलागेको:') !!}
+                                                </div>
+                                                <div class="col-md-8">
+                                                    {!! Form::radio('liquidated_damage', '0',true,['class'=>'liquidated_damage_update']) !!} नलागेको
+                                                    &nbsp&nbsp&nbsp&nbsp&nbsp{!! Form::radio('liquidated_damage', '1',false,['class'=>'liquidated_damage_update']) !!} लागेको
+                                                    @if($errors->has('liquidated_damage'))
+                                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                        <span id="liquidated_damageStatus" class="sr-only">(error)</span>
+                                                    @elseif(count($errors->all())>0)
+                                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                        <span id="liquidated_damageStatus" class="sr-only">(success)</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {!! Form::checkbox('remove_current_file', '0',false) !!} Remove Current File
+                                    </div>
+                                    <div class="col-md-6">
+                                        {!! Form::file('file') !!}New file (Optional)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- description -->
+                            <div class="form-group col-md-12 col-lg-12 @if($errors->has('remarks')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                <div class="input-group pro_make_full showToolTip">
+                                    {!! Form::label('Remarks','कैफियत:') !!}
+                                    {!! Form::textarea('remarks', old('remarks'), ['id'=>'remarks_update','class'=>'form-control']) !!}
+                                    @if($errors->has('remarks'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                              aria-hidden="true"></span>
+                                        <span id="descriptionStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger">
+                                            <small><i class="fa fa-warning"></i> {!! $errors->first('remarks') !!}
+                                            </small>
+                                        </div>
+                                    @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                              aria-hidden="true"></span>
+                                        <span id="descriptionStatus" class="sr-only">(success)</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">Save
+                            </button>
+                        {!! Form::close() !!}
+                            {!!Form::open(['route'=>['delete.time_extension'],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                            <div class="pull-right">
+                                {!! Form::hidden('extensionId', null,['id'=>'extensionId_delete']) !!}
+                                <button class="btn btn-danger" data-loading-text="Saving..." onclick="return confirm('Delete entry?')" autocomplete="off">Delete
+                                </button>
+                            </div>
+                        {!! Form::close() !!}
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="papersEdit" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Update Papers And Files</h4>
+                </div>
+                <div class="modal-body">
+                        {!!Form::open(['route'=>['update.old.activity_log'],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                        <!-- title -->
+                            <div class="form-group col-md-12 col-lg-12 @if($errors->has('title')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            {!! Form::hidden('paper_id', null,['id'=>'paper_id']) !!}
+                                            {!! Form::label('Title','Title:') !!}
+                                            {!! Form::text('title', old('title'),['id'=>'paper_title','class'=>"form-control",'placeholder'=>'Title']) !!}
+                                            @if($errors->has('title'))
+                                                <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                      aria-hidden="true"></span>
+                                                <span id="titleStatus" class="sr-only">(error)</span>
+                                                <div class="alert alert-danger">
+                                                    <small>
+                                                        <i class="fa fa-warning"></i> {!! $errors->first('title') !!}
+                                                    </small>
+                                                </div>
+                                            @elseif(count($errors->all())>0)
+                                                <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                      aria-hidden="true"></span>
+                                                <span id="titleStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            {!! Form::label('dateUpdate','Date:') !!}
+                                            {!! Form::text('dateUpdate', old('dateUpdate'),['id'=>'dateUpdate_','class'=>"form-control nepaliDate",'placeholder'=>'Date']) !!}
+                                            @if($errors->has('title'))
+                                                <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                                      aria-hidden="true"></span>
+                                                <span id="dateUpdate_Status" class="sr-only">(error)</span>
+                                                <div class="alert alert-danger">
+                                                    <small>
+                                                        <i class="fa fa-warning"></i> {!! $errors->first('dateUpdate') !!}
+                                                    </small>
+                                                </div>
+                                            @elseif(count($errors->all())>0)
+                                                <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                                      aria-hidden="true"></span>
+                                                <span id="dateUpdate" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="form-group col-md-12 col-lg-12 @if($errors->has('liquidated_damage')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip" @if($errors->has('liquidated_damage')) title="{!!$errors->first('type_update')!!}" @endif>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    {!! Form::label('type_update','Type:') !!}
+                                                    {!! Form::Select('type',progressActivityLogsTypes()['project'],null,['class'=>'paperSelectorEdit']) !!}
+                                                    @if($errors->has('type_update'))
+                                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                                        <span id="type_updateStatus" class="sr-only">(error)</span>
+                                                    @elseif(count($errors->all())>0)
+                                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                                        <span id="type_updateStatus" class="sr-only">(success)</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- description -->
+                            <div class="form-group col-md-12 col-lg-12 @if($errors->has('remarks')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                <div class="input-group pro_make_full showToolTip">
+                                    {!! Form::label('Remarks','कैफियत:') !!}
+                                    {!! Form::textarea('paperremarks', old('paperremarks'), ['id'=>'paperremarks_update','class'=>'form-control']) !!}
+                                    @if($errors->has('paperremarks'))
+                                        <span class="glyphicon glyphicon-remove-circle form-control-feedback"
+                                              aria-hidden="true"></span>
+                                        <span id="descriptionStatus" class="sr-only">(error)</span>
+                                        <div class="alert alert-danger">
+                                            <small><i class="fa fa-warning"></i> {!! $errors->first('paperremarks') !!}
+                                            </small>
+                                        </div>
+                                    @elseif(count($errors->all())>0)
+                                        <span class="glyphicon glyphicon-ok-circle form-control-feedback"
+                                              aria-hidden="true"></span>
+                                        <span id="descriptionStatus" class="sr-only">(success)</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">Save
+                            </button>
+                        {!! Form::close() !!}
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="liquidationDamageModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Update Liquidation Damages</h4>
+                </div>
+                <div class="modal-body">
+                        {!!Form::open(['route'=>['update.old.liquidation_damage'],'method'=>'post','class'=>'showSavingOnSubmit','files'=>true])!!}
+                            {!! Form::hidden('liquidation_damage_id', null,['id'=>'liquidation_damage_id']) !!}
+                                    <!-- liquidation_update_amount -->
+                                    <div class="form-group col-md-6 col-lg-6 @if($errors->has('liquidation_update_amount')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            {!! Form::label('liquidation_update_amount','Amount') !!}
+                                            {!! Form::text('liquidation_update_amount', null, ['id'=>'liquidation_update_amount','class'=>'form-control']) !!}
+                                            @if($errors->has('liquidation_update_amount'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="liquidation_update_amountStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('liquidation_update_amount') !!}</small></div>
+                                            @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="liquidation_update_amountStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <!-- liquidation_collected_date -->
+                                    <div class="form-group col-md-6 col-lg-6 @if($errors->has('liquidation_collected_date')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            {!! Form::label('liquidation_collected_date','Collection Date') !!}
+                                            {!! Form::text('liquidation_collected_date', null, ['class'=>'form-control nepaliDate']) !!}
+                                            @if($errors->has('liquidation_collected_date'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="liquidation_collected_dateStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('liquidation_collected_date') !!}</small></div>
+                                            @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="liquidation_collected_dateStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <!-- liquidation_remakrs -->
+                                    <div class="form-group col-md-12 col-lg-12 @if($errors->has('liquidation_remakrs')) has-error @elseif(count($errors->all())>0) has-success @endif has-feedback">
+                                        <div class="input-group pro_make_full showToolTip">
+                                            {!! Form::label('liquidation_remakrs','Remarks') !!}
+                                            {!! Form::textarea('liquidation_remakrs', null, ['class'=>'form-control']) !!}
+                                            @if($errors->has('liquidation_remakrs'))
+                                            <span class="glyphicon glyphicon-remove-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="liquidation_remakrsStatus" class="sr-only">(error)</span>
+                                            <div class="alert alert-danger"><small><i class="fa fa-warning"></i> {!! $errors->first('liquidation_remakrs') !!}</small></div>
+                                            @elseif(count($errors->all())>0)
+                                            <span class="glyphicon glyphicon-ok-circle form-control-feedback" aria-hidden="true"></span>
+                                            <span id="liquidation_remakrsStatus" class="sr-only">(success)</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-6">
+                                        {!! Form::checkbox('remove_current_file', '0',false) !!} Remove Current File
+                                    </div>
+                                    <div class="col-md-6">
+                                        {!! Form::file('file') !!}New file (Optional)
+                                    </div>
+                                <button class="btn btn-success" data-loading-text="Saving..." autocomplete="off">Save
+                                </button>
+                        {!! Form::close() !!}
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+@section('footerContent')
+    <script type="text/javascript" src="{{asset('public/admin/plugin/select2/js/select2.full.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('public/admin/js/menu/menu.js')}}"></script>
+    <script type="text/javascript" src="{{asset('public/admin/js/editor.js')}}"></script>
+    <script type="text/javascript">
+        $('document').ready(function () {
+            $('#date').nepaliDatePicker({
+                npdMonth: true,
+                npdYear: true,
+                npdYearCount: 10 // Options | Number of years to show
+            });
+            $('.nepaliDate').nepaliDatePicker({
+                npdMonth: true,
+                npdYear: true,
+                npdYearCount: 10 // Options | Number of years to show
+            });
+        });
+    </script>
+@stop
+
+

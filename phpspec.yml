@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: proDealer
+        psr4_prefix: proDealer
+        src_path: app
