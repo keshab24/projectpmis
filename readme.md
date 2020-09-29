@@ -15,6 +15,7 @@
 	- [Problem 4 - Display inactive human resources in root user page](#problem-4--display-list-of-humanresources-users-who-are-have-not-logged-into-system-for-at-least-2-days-the-list-should-only-be-visible-to-users-with-access-root-level)
 	- [Problem 5 - Fix a bug in daily progress images](#problem-5--bug-fix)
 	- [Problem 6 - ](#problem-6--rectify-data-at-db-level)
+-[How To Submit](#how-to-submit)
 
 # Getting Started
 ## Setup
@@ -25,13 +26,13 @@
 * Any Preferred Workbench (Sequel Pro, MySQL Workbench) for SQL Databases.
 
 ### Local Development:
-1. Clone the Repository: `git clone https://github.com/dolpotech/pmis-challenge.git`.
+1. Fork the Repository: `https://github.com/dolpotech/pmis-challenge.git` and clone your forked Repo
 2. Run `composer install` to Install Dependencies.
 3. Copy contents of  `.env.example` file to a new file `.env`, If you're on Mac OSX or Linux just run: `cp .env.example .env`
 4. Generate an app encryption key: `php artisan key:generate`.
-5. create an empty database for the project.
+5. create an empty database for the project and import docs/challenge_pmis.sql
 6. In the `.env` file, add database information by filling the `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` options to match the credentials of the database you just created.
-7. Migrate the database: `php artisan migrate`.
+7. Migrate the database: `php artisan migrate`. **if required
 
 # Project Description
 
@@ -205,3 +206,8 @@ Human Resources added here should appear in select list in the same format in
 
 
       
+
+# How To Submit
+send gmail to `info@mstech.com` with 
+1. subject pmis-solution submit 
+2. your solution-repo link
