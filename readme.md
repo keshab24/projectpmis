@@ -109,9 +109,9 @@ Datas are there too..
 Where people under positions are registered
 
 
-In `Route::resource('project') -> Admin\ProjectController -> show() -> project/show.blade.php` 
 
 ### Expected Result :
+In `Route::resource('project') -> Admin\ProjectController -> show() -> project/show.blade.php` 
 <img src="docs/images/project_show1.png" />
 <img src="docs/images/project_show2.png" />
 
