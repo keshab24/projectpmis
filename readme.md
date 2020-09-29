@@ -27,7 +27,7 @@
 ### Local Development:
 1. Clone the Repository: `git clone https://github.com/dolpotech/pmis-challenge.git`.
 2. Run `composer install` to Install Dependencies.
-3. Copy contents of  `.env.example` file to a new file `.env`, If you're on Mac OSX just run: `cp .env.example .env`
+3. Copy contents of  `.env.example` file to a new file `.env`, If you're on Mac OSX or Linux just run: `cp .env.example .env`
 4. Generate an app encryption key: `php artisan key:generate`.
 5. create an empty database for the project.
 6. In the `.env` file, add database information by filling the `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` options to match the credentials of the database you just created.
@@ -73,10 +73,10 @@ Other fields are stored from input forms
 
 **User:**
 
-`User` (table=pro_users)stores all users which has `access` and `type_flag` fields for
+`User` (table=pro_users)stores all users which has `access(varchar)` and `type_flag(int)` fields for
 roles and permissions
 
-`access` stores 'Top Level' or 'Limited' managed statically from select list in user creation form
+`access` stores `Top Level` or `Limited` managed statically from select list in user creation form
 
 `type_flag` is ForeignKey field uses `UserTypeFlag` model which stores 10 different types in table('pro_user_type')
 
