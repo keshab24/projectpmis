@@ -22,13 +22,14 @@ class ImplementingofficeController extends AdminBaseController {
         $this->middleware(function ($request, $next) use ($implementingoffice) {
             restrictToImplementingOffice('abort');
             $this->implementingoffice = $implementingoffice;
-            if(Auth::user()->implementing_office_id!=1) {
-                if(Auth::user()->implementingOffice->isMonitoring==1){
-                    $this->implementingoffice=Auth::user()->implementingOffice->MonitorSeesImplementing();
-                }else{
-                    $this->implementingoffice=$implementingoffice->whereId(Auth::user()->implementing_office_id);
-                }
-            }
+//            if(Auth::user()->implementing_office_id!=1) {
+//                if(Auth::user()->implementingOffice->isMonitoring==1){
+//                    $this->implementingoffice=Auth::user()->implementingOffice->MonitorSeesImplementing();
+//                    dd($this->implementingoffice->get());
+//                }else{
+//                    $this->implementingoffice=$implementingoffice->whereId(Auth::user()->implementing_office_id);
+//                }
+//            }
             return $next($request);
         });
 
@@ -40,7 +41,7 @@ class ImplementingofficeController extends AdminBaseController {
         $this->pro_data['order'] = 'asc';
         $this->pro_data['other_data'] = '';
         $this->pro_data['default_search'] = '';
-        $this->pro_data['implementingoffices'] = $this->implementingoffice->where('level','>',0);
+        $this->pro_data['implementingoffices'] = $this->implementingoffice;
         if(isset($_GET['search'])){
             $this->pro_data['default_search'] = $_GET['search'];
             $this->pro_data['implementingoffices'] = $this->pro_data['implementingoffices']->search($_GET['search']);
@@ -60,9 +61,9 @@ class ImplementingofficeController extends AdminBaseController {
         }
         $this->pro_data['trashes_no'] = $implementingOffice->onlyTrashed()->count();
         $this->pro_data['implementingoffices'] = $this->pro_data['implementingoffices']->paginate($this->pro_data['limit']);
-        // $parent = $this->pro_data['implementingoffices'][0];
+
         // dd($parent->parent->title);
-        
+
         return view('admin.implementingoffice.index',$this->pro_data);
     }
 

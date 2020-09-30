@@ -16,7 +16,7 @@
 	- [Problem 5 - Fix a bug in daily progress images](#problem-5--bug-fix)
 	- [Problem 6 - DB Rectification](#problem-6--rectify-data-at-db-level)
 	
--[How To Submit](#how-to-submit)
+- [How To Submit](#how-to-submit)
 
 # Getting Started
 ## Setup
@@ -45,7 +45,7 @@ vidoes of progress are recorded.
 We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` implementing_office for this challenge with associated root user having:
 - `email`=challenge@gmail.com 
 - `pass`=challenge@321
-
+--------
 ### Project Structure:
 * Everything is quite similar to default laravel structure
 * Except:
@@ -53,7 +53,7 @@ We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` implementin
    
 * All routes in routes\web.php **including api routes**
         
-        
+------------    
         
 ### Database and Models:
  ER-Diagrams are in `docs/er_diagram/`
@@ -82,8 +82,8 @@ roles and permissions
 
 `type_flag` is ForeignKey field uses `UserTypeFlag` model which stores 10 different types in table('pro_user_type')
 
-**When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically 
-        
+*When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically*
+--------
 # Problems
 ### Problem 1 :: Manage Manpowers and Human Resources for project and dailyprogress
 To register manpowers and human_resources(Model=Engineer) in dailyprogress we have to first assign them to its Project.
@@ -97,7 +97,8 @@ We have 3 types of manpower categories managed from helpers function `manpowerTy
 ]
 ```
         
-**We must divide manpowers and human resources under these categories dynamically** 
+**We must divide manpowers and human resources under these categories dynamically **
+ 
 
 #### Manpower
 `Manpower CRUD` is already given:
@@ -209,6 +210,9 @@ Human Resources added here should appear in select list in the same format in
       
 
 # How To Submit
-send gmail to `info@mstech.com` with 
-1. subject pmis-solution submit 
+##### - send email to `info@mstech.com.np` with
+1. subject : pmis-solution submit 
 2. your solution-repo link
+3. a short-clip presentation of solution
+
+##### - you may also contact us on `9861611733`(same for viber, whatsapp), `9851015697`, `01-5552909` and present your solution via virtual meeting
