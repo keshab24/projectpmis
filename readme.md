@@ -81,7 +81,8 @@ roles and permissions
 `access` stores `Top Level` or `Limited` managed statically from select list in user creation form
 
 `type_flag` is ForeignKey field uses `UserTypeFlag` model which stores 10 different types in table('pro_user_type')
-* When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically *
+Note: ```When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically *```
+
 --------
 # Problems
 ### Problem 1 :: Manage Manpowers and Human Resources for project and dailyprogress
