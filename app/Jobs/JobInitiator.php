@@ -27,14 +27,10 @@ class JobInitiator
     {
         //dd();
         $smsClass = "PMIS\Jobs\\".$this->theme."\\".$this->theme."Sms";
-        //Email push is in dummy mode and notification already pushed from another job... so only sms needed to be pushed from here .
-//        $emailClass = "PMIS\Jobs\\".$this->theme."\\".$this->theme."Email";
-//        $notificationClass = "PMIS\Jobs\\".$this->theme."\\".$this->theme."Notification";
 
         foreach ($this->notification->UserType as $userTypes) {
             $function = 'userFrom' . $userTypes->type;
             $data = $this->$function($project);
-//            $noticeObject->visibleToUser()->attach($data['user_id']);
 
             foreach ($data['phone_number'] as $number) {
                 if(class_exists($smsClass)){
@@ -44,24 +40,7 @@ class JobInitiator
                     \Log::info("class". $smsClass ."not found while dispatching job");
                 }
             }
-            /*foreach ($data['email'] as $index => $email) {
-                if(class_exists($emailClass)){
-                    dispatch(new $emailClass($noticeObject->description, $email))->onQueue('email');
-                }else{
-                    //dd("emmail not found");
-                    Log::info("class". $emailClass ."not found while dispatching job");
-                }
-            }*/
 
-           /* foreach ($data['devices'] as $deviceKey) {
-                if(class_exists($notificationClass)){
-                    dispatch(new $notificationClass($noticeObject, $deviceKey))->onQueue('notification');
-                }else{
-                    //dd("notification not found");
-                    Log::info("class". $notificationClass ."not found while dispatching job");
-                }
-            }*/
-//            $noticeObject->visibleToUser()->attach($data['user_id']);
         }
         $this->preventFromPublic($noticeObject);
     }

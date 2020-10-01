@@ -1117,41 +1117,6 @@ function getRomanValue()
 
 }
 
-function progresses()
-{
-    $return[1] = "Design Estimate";
-    $return[2] = "Tender Evalutaion";
-    $return[3] = "Under Construction";
-    $return[4] = "Near To Completion";
-    $return[5] = "Total Completed";
-    return $return;
-}
-
-function procurementFields()
-{
-    $return['estimated_amount'] = "Estimated Amount";
-    $return['con_est_amt_net'] = "Contract Estimated Net Amount";
-    $return['est_approved_date'] = "Estimated Approved Date";
-    $return['method'] = "Method";
-    $return['contract_amount'] = "Contract Amount";
-    $return['bid_does_ready_est'] = "Bid Does Ready Estimate";
-    $return['bid_does_ready_act'] = "Bid Does Ready Actual";
-    $return['no_obj_est1'] = "No Objection Estimate 1";
-    $return['call_for_bid_est'] = "Call For Bid Estimate";
-    $return['call_for_bid_act'] = "Call For Bid Actual";
-    $return['bid_open_est'] = "Bid Open Estimate";
-    $return['bid_open_act'] = "Bid Open Actual";
-    $return['bid_eval_act'] = "Bid Evaluation Actual";
-    $return['no_obj_est2'] = "No Objection Estimate 2";
-    $return['no_obj_act2'] = "No Objection Actual 2";
-    $return['con_sign_est'] = "Contract Sign Estimate";
-    $return['contract_date'] = "Contract Date";
-    $return['con_end_est'] = "Contract End Estimate";
-    $return['completion_date'] = "Completion Date";
-
-    return $return;
-
-}
 
 function androidUnAuthorized()
 {
