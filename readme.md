@@ -64,7 +64,7 @@ We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` as implemen
 
 **DailyProgress:**
 
-`DailyProgress` stores data in fields manpower, equipments, materials, activities, samples in associative-array form (like json)
+`DailyProgress` stores data in fields manpower, equipments, materials, activities, samples in `associative-array form (like json)`
 
 `Manpower` & `Engineer`(Human Resource) Models are used to store data in `manpower` field of `DailyProgress`
 Similarly, `Equipment` for `equipments`, `Material` for `materials` , `WorkActivity` for 'activities'
