@@ -31,7 +31,7 @@
 2. Run `composer install` to Install Dependencies.
 3. Copy contents of  `.env.example` file to a new file `.env`, If you're on Mac OSX or Linux just run: `cp .env.example .env`
 4. Generate an app encryption key: `php artisan key:generate`.
-5. create an empty database for the project and import docs/challenge_pmis.sql
+5. create an empty database for the project and import `docs/challenge_pmis.sql`
 6. In the `.env` file, add database information by filling the `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` options to match the credentials of the database you just created.
 7. Migrate the database: `php artisan migrate`. **if required
 
