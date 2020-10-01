@@ -211,9 +211,7 @@ Human Resources added here should appear in select list in the same format in
       
 
 # How To Submit
-##### - send email to `info@mstech.com.np` with
-1. subject : pmis-solution submit 
-2. your solution-repo link
-3. a short-clip presentation of solution
-
-##### - you may also contact us on `9861611733`(same for viber, whatsapp), `9851015697`, `01-5552909` and present your solution via virtual meeting
+1. Create a pull request to this repo 
+3. send email to `info@mstech.com.np` with
+- subject : pmis-solution submit 
+- includes: name, your github username and github pull request link 
