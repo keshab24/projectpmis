@@ -42,7 +42,7 @@ In PMIS-challenge, ImplementingOffices have many Projects each having its own Da
 In DailyProgress manpower and human-resources, tools and equipments, materials stock, quantities of work done, weather, images/
 vidoes of progress are recorded.
 
-We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` implementing_office for this challenge with associated root user having:
+We use `CHALLENGE BUILDING CONSTRUCTION PROJECT COORDINATION OFFICE` as implementing_office for this challenge with associated root user having:
 - `email`=challenge@gmail.com 
 - `pass`=challenge@321
 --------
@@ -82,7 +82,8 @@ roles and permissions
 
 `type_flag` is ForeignKey field uses `UserTypeFlag` model which stores 10 different types in table('pro_user_type')
 
-*When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically*
+*Note*: ```When human_resource is created , a user with `email = input_email  and password = mobile` is created automatically *```
+
 --------
 # Problems
 ### Problem 1 :: Manage Manpowers and Human Resources for project and dailyprogress
