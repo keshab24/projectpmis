@@ -14,9 +14,6 @@
 	- [Problem 3 - Create Api for materials and tools and equipment used](#problem-3--create-an-api-endpoint-to-calculate-the-total-quantity-of--materials-tools-and-equipment-used-per-week)
 	- [Problem 4 - Display inactive human resources in root user page](#problem-4--display-list-of-humanresources-users-who-are-have-not-logged-into-system-for-at-least-2-days-the-list-should-only-be-visible-to-users-with-access-root-level)
 	- [Problem 5 - Fix a bug in daily progress images](#problem-5--bug-fix)
-	- [Problem 6 - DB Rectification](#problem-6--rectify-data-at-db-level)
-	
-- [How To Submit](#how-to-submit)
 
 # Getting Started
 ## Setup
@@ -202,16 +199,3 @@ Human Resources added here should appear in select list in the same format in
     one particular image is showing in all DPs 
     
     Should identify the issue and fix it
-    
-    
-### Problem 6 :: Rectify Data At DB-Level
-    ..................
-
-
-      
-
-# How To Submit
-1. Create a pull request to this repo 
-3. Send email to `info@mstech.com.np` with
-    - subject : pmis-solution submit 
-    - includes: name, your github username and github pull request link 
