@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 29, 2020 at 06:45 PM
+-- Generation Time: Oct 05, 2020 at 05:32 PM
 -- Server version: 8.0.21
 -- PHP Version: 7.2.33-1+ubuntu20.04.1+deb.sury.org+1
 
@@ -6406,12 +6406,7 @@ INSERT INTO `migrations` (`migration`, `batch`) VALUES
 ('2020_06_18_112439_add_fields_activity_logs_table', 39),
 ('2020_06_21_065940_create_daily_progress_users_table', 40),
 ('2020_08_04_130114_create_old_project_codes_table', 41),
-('2020_08_12_054348_create_apug_kagajats_table', 42),
-('2020_08_13_054625_create_myad_thap_documents_table', 43),
-('2020_08_13_062521_create_myad_thap_document_files_table', 44),
-('2020_09_01_120042_add_field_category_engineers_table', 45),
-('2020_09_08_044731_add_count_field_manpowers_table', 46),
-('2020_09_11_060435_add_daily_progress_id_pro_activity_log_table', 47);
+('2020_09_08_044731_add_count_field_manpowers_table', 46);
 
 -- --------------------------------------------------------
 
