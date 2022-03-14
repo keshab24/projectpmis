@@ -135,7 +135,8 @@ function getFileName($file)
 function makeImageName($fileName, $file_info = null)
 {
     if ($file_info == null) {
-        $extension = end((explode('.', $fileName)));
+        $tmp = explode('.', $fileName);
+        $extension = end($tmp);
         $fileName = str_replace('.' . $extension, '', $fileName);
     } else {
         $extension = pathinfo($file_info, PATHINFO_EXTENSION);

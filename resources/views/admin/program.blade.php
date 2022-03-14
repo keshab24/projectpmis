@@ -6,7 +6,7 @@
             <br>
             <div class="col-md-1"></div>
             <div class="col-md-4">
-                <img src="{{asset('public/images/home_banner.png')}}" class="img-responsive" alt="Home Banner"/>
+                <img src="{{asset('admin/images/home_banner.png')}}" class="img-responsive" alt="Home Banner"/>
             </div>
             <div class="col-md-6">
                 <h1 style="color: #d2000b" class="text-left">

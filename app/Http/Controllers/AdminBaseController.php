@@ -68,11 +68,18 @@ class AdminBaseController extends Controller
      */
     public function uploadImage($pathName, $fileName, $imageFile, $oldFileName = null)
     {
+
+        
         $this->makeFolders($pathName);
-        Image::make($imageFile->getRealPath())->heighten(100)->save('public/images/' . $pathName . '/thumbnail/thumbvtx' . $fileName);
-        Image::make($imageFile->getRealPath())->save('public/images/' . $pathName . '/original/orivtx' . $fileName);
-        Image::make($imageFile->getRealPath())->widen(400)->save('public/images/' . $pathName . '/' . $fileName);
-        Image::make($imageFile->getRealPath())->widen(1024)->save('public/images/' . $pathName . '/1024' . $fileName);
+        $source = $imageFile->getRealPath();
+        $target = public_path();
+
+        Image::make($imageFile->getRealPath())->heighten(100)->save('public\admin\images\' . $pathName . '/thumbnail/thumbvtx/' . $fileName);
+        
+        Image::make($imageFile->getRealPath())->save("public\admin\images/" . $pathName . "\original\orivtx" . $fileName);
+        
+        Image::make($imageFile->getRealPath())->widen(400)->save('public/admin/images/' . $pathName . '/' . $fileName);
+        Image::make($imageFile->getRealPath())->widen(1024)->save('public/admin/images/' . $pathName . '/1024' . $fileName);
         if ($oldFileName != null && $oldFileName != ' ') {
             $this->removeFiles($pathName, $oldFileName);
         }
@@ -111,10 +118,11 @@ class AdminBaseController extends Controller
      */
     public function makeFolders($pathName)
     {
-        if (!is_dir('public/images/' . $pathName)) mkdir('public/images/' . $pathName);
-        if (!is_dir('public/images/' . $pathName . '/thumbnail')) mkdir('public/images/' . $pathName . '/thumbnail');
-        if (!is_dir('public/images/' . $pathName . '/original')) mkdir('public/images/' . $pathName . '/original');
-        if (!is_dir('public/images/' . $pathName . '/1024')) mkdir('public/images/' . $pathName . '/1024');
+       
+        if (!is_dir('/admin/images/' . $pathName)) mkdir('/admin/images/' . $pathName,077,true);
+        if (!is_dir('/admin/images/' . $pathName . '/thumbnail')) mkdir('/admin/images/' . $pathName . '/thumbnail',077,true);
+        if (!is_dir('/admin/images/' . $pathName . '/original')) mkdir('/admin/images/' . $pathName . '/original',077,true);
+        if (!is_dir('/admin/images/' . $pathName . '/1024')) mkdir('/admin/images/' . $pathName . '/1024',077,true);
         return true;
     }
 

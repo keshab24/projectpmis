@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="_token" content="{{ csrf_token() }}"/>
     <title>ProAdmin :: PMIS</title>
-    <link href="{{ asset('public/admin/css/proStyleAdmin.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('public/admin/css/pro_checkbox.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{asset('public/admin/plugin/select2/css/select2.css')}}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('public/plugin/datepicker/nepali.datepicker.v2.1.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('/admin/css/proStyleAdmin.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('/admin/css/pro_checkbox.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{asset('/admin/plugin/select2/css/select2.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('/plugin/datepicker/nepali.datepicker.v2.1.min.css') }}" rel="stylesheet" type="text/css">
     <script>var $home_path = "{!! route('home') !!}";var $base_path = "{!! route('home') !!}";</script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-58851320-21"></script>
@@ -51,16 +51,16 @@
         @yield('content')
     </main>
     @include('partials._admin_footer')
-    <script src="{{asset('public/admin/js/jquery-2.1.1.min.js')}}"type="text/javascript"></script>
-    <script src="{{asset('public/admin/js/bootstrap.min.js')}}"type="text/javascript"></script>
-    <script src="{{asset('public/admin/js/dropit.js')}}" type="text/javascript"></script>
-    <script src="{{asset('public/admin/plugin/select2/js/select2.full.min.js')}}" type="text/javascript"></script>
-    <script src="{{asset('public/admin/js/appear/jquery.appear.min.js')}}" type="text/javascript"></script>
-    <script src="{{asset('public/admin/js/nicescroll.js')}}" type="text/javascript"></script>
-    <script src="{{asset('public/admin/js/sweet-alert.min.js')}}" type="text/javascript"></script>
-    <script src="{{asset('public/admin/js/common.js')}}" type="text/javascript"></script>
-    <script src="{{ asset('public/admin/js/pusher.min.js') }}" type="text/javascript"></script>
-    <script type="text/javascript" src="{{asset('public/plugin/datepicker/nepali.datepicker.v2.1.min.js')}}"></script>
+    <script src="{{asset('/admin/js/jquery-2.1.1.min.js')}}"type="text/javascript"></script>
+    <script src="{{asset('/admin/js/bootstrap.min.js')}}"type="text/javascript"></script>
+    <script src="{{asset('/admin/js/dropit.js')}}" type="text/javascript"></script>
+    <script src="{{asset('/admin/plugin/select2/js/select2.full.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('/admin/js/appear/jquery.appear.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('/admin/js/nicescroll.js')}}" type="text/javascript"></script>
+    <script src="{{asset('/admin/js/sweet-alert.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('/admin/js/common.js')}}" type="text/javascript"></script>
+    <script src="{{ asset('/admin/js/pusher.min.js') }}" type="text/javascript"></script>
+    <script type="text/javascript" src="{{asset('/plugin/datepicker/nepali.datepicker.v2.1.min.js')}}"></script>
     <script type="text/javascript">
         (function($) {
             $(document).ready(function() {

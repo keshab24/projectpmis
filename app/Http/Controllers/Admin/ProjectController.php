@@ -115,6 +115,7 @@ class ProjectController extends AdminBaseController
 
     public function show(Project $project, Engineer $engineer, ProjectBlocks $projectBlocks, Manpower $manpower)
     {
+       
         restrictEngineers($this->user_info->type_flag);
         seeDetail(clone ($this->project)->get()->merge(clone ($this->not_running_projects)->get()), $project->id);
         $this->pro_data['project'] = $project;
@@ -135,7 +136,7 @@ class ProjectController extends AdminBaseController
         foreach ($ids as $id) $syncManpowers = array_merge($syncManpowers, $id);
 
         $project->Engineers()->sync($syncManpowers);
-        session()->flash('update_success_info', '" Project named ' . $project->name . ' \'s Project Cordinaors list"');
+        session()->flash('update_success_info', '" Project which named ' . $project->name . ' \'s Project Cordinaors list"');
         return redirect()->back();
     }
 

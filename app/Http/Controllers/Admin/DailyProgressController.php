@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use PMIS\ActivityLog;
 use PMIS\ActivityLogFiles;
+use PMIS\Engineer;
 use PMIS\DailyProgress;
 use PMIS\DateCon;
 use PMIS\Equipment;
@@ -29,9 +30,11 @@ class DailyProgressController extends AdminBaseController
         });
     }
 
-    public function create(Project $project, Manpower $manpower, Equipment $equipment, Material $material, WorkActivity $work_activity){
+    public function create(Project $project, Manpower $manpower,Engineer $engineer, Equipment $equipment, Material $material, WorkActivity $work_activity){
         $this->pro_data['project'] = $project;
+        
         $this->pro_data['manpowers'] = $manpower->whereStatus(1)->orderBy('order')->get();
+        $this->pro_data['project_engineers'] = 
         $this->pro_data['equipments'] = $equipment::active()->select('title','unit','status','id','type')->get();
         $this->pro_data['materials'] = $material::active()->select('title','unit','status','id','type')->get();
         $this->pro_data['activities'] = $work_activity::active()->select('title','status','id','type','code','unit')->get();
@@ -47,7 +50,9 @@ class DailyProgressController extends AdminBaseController
 
         $this->pro_data['existing_logs'] = ActivityLog::where('submitted_date', dateBS(date('Y-m-d')))->where('project_id', $project->id)->get();
         $this->pro_data['existing_files'] = ActivityLogFiles::get();
-
+        
+        $this->pro_data['dailyProgressUsers'] = $engineer->where('implementing_office', $project->implementing_office_id)->pluck('name', 'id');
+        
         $this->pro_data['blocks'] = add_my_array(ProjectBlocks::whereProjectId($project->id)->pluck('block_name', 'id'), "Select Block");
         $this->pro_data['editable_daily_progress'] = $project->dailyProgress()->where('date', '>=', dateBS(Carbon::now()->subDays(2)->format('Y-m-d')))->orderBy('date', 'desc')->get();
 
