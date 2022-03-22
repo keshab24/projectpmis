@@ -14,7 +14,7 @@ return [
     */
     'env' => env('APP_ENV', 'production'),
     'name' => env('APP_NAME', 'ProAdmin'),
-    'debug' => env('APP_DEBUG', false),
+    'debug' => env('APP_DEBUG', true),
     'app_url' => env('APP_URL','http://144.91.73.87/pmis'),
     /*
     |--------------------------------------------------------------------------

@@ -31,22 +31,22 @@ class DailyProgressController extends AdminBaseController
     }
 
     public function create(Project $project, Manpower $manpower,Engineer $engineer, Equipment $equipment, Material $material, WorkActivity $work_activity){
-        $this->pro_data['project'] = $project;
         
         $this->pro_data['manpowers'] = $manpower->whereStatus(1)->orderBy('order')->get();
         $this->pro_data['project_engineers'] = 
         $this->pro_data['equipments'] = $equipment::active()->select('title','unit','status','id','type')->get();
         $this->pro_data['materials'] = $material::active()->select('title','unit','status','id','type')->get();
         $this->pro_data['activities'] = $work_activity::active()->select('title','status','id','type','code','unit')->get();
+        $this->pro_data['project'] = $project;
         $this->pro_data['weathers'] = ['Sunny' => 'Sunny', 'Cloudy' => 'Cloudy', 'Rainning' => 'Rainning'];
         $this->pro_data['activity_statuses'] = ['No Act' => 'No Act', 'On progress' => 'On progress', 'Done' => 'Done', 'Completed' => 'Completed'];
-
         if (isset($_GET['today'])){
             $daily_progress = $project->dailyProgress()->where('date', date('Y-m-d'))->latest()->first();
             $this->pro_data['daily_progress'] = $daily_progress;
         }else{
             $daily_progress = null;
         }
+
 
         $this->pro_data['existing_logs'] = ActivityLog::where('submitted_date', dateBS(date('Y-m-d')))->where('project_id', $project->id)->get();
         $this->pro_data['existing_files'] = ActivityLogFiles::get();

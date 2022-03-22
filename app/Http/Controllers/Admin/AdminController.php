@@ -1,46 +1,47 @@
 <?php
 namespace PMIS\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use PMIS\Zone;
+use PMIS\Month;
+use PMIS\State;
+
+use PMIS\Notice;
+use PMIS\ProLog;
+use PMIS\Region;
+use PMIS\Sector;
+use PMIS\Vendor;
 use PMIS\Address;
-use PMIS\Allocation;
-use PMIS\AuthorizedPerson;
-use PMIS\BudgetTopic;
-use PMIS\ConstructionType;
-use PMIS\Contractor;
-use PMIS\CurrentProgress;
+use PMIS\Project;
 use PMIS\District;
 use PMIS\Division;
-use PMIS\Divisionchief;
 use PMIS\Document;
 use PMIS\Employee;
 use PMIS\Engineer;
-use PMIS\ExpenditureTopic;
-use PMIS\Fiscalyear;
-use PMIS\FundStore;
-use PMIS\Http\Controllers\AdminBaseController;
-use PMIS\ImplementingMode;
-use PMIS\ImplementingOffice;
-use PMIS\IncomeTopic;
-use PMIS\JointVenture;
-use PMIS\LumpSumBudget;
-use PMIS\Month;
-use PMIS\Notice;
-use PMIS\NotificationType;
-use PMIS\Procurement;
 use PMIS\Progress;
-use PMIS\ProgressTrack;
-use PMIS\Project;
-use PMIS\ProjectGroup;
-use PMIS\ProLog;
-use PMIS\Region;
+use PMIS\FundStore;
+use PMIS\Allocation;
+use PMIS\Contractor;
+use PMIS\Fiscalyear;
 use PMIS\SalaryHead;
-use PMIS\Sector;
-use PMIS\State;
+use PMIS\BudgetTopic;
+use PMIS\IncomeTopic;
+use PMIS\Procurement;
+use PMIS\JointVenture;
+use PMIS\ProjectGroup;
 use PMIS\UserTypeFlag;
-use PMIS\Vendor;
-use PMIS\Zone;
+use PMIS\Divisionchief;
+use PMIS\LumpSumBudget;
+use PMIS\ProgressTrack;
+use PMIS\CurrentProgress;
+use PMIS\AuthorizedPerson;
+use PMIS\ConstructionType;
+use PMIS\ExpenditureTopic;
+use PMIS\ImplementingMode;
+use PMIS\NotificationType;
+use Illuminate\Http\Request;
+use PMIS\ImplementingOffice;
+use Illuminate\Support\Facades\Auth;
+use PMIS\Http\Controllers\AdminBaseController;
 
 class AdminController extends AdminBaseController {
     protected $pro_data;
@@ -870,4 +871,3 @@ class AdminController extends AdminBaseController {
     }
 
 }
-

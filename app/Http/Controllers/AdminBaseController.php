@@ -2,11 +2,13 @@
 
 namespace PMIS\Http\Controllers;
 
+use PMIS\Fiscalyear;
+use PMIS\DailyProgressUser;
+use PMIS\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+
 use Intervention\Image\ImageManagerStatic as Image;
-use PMIS\DailyProgressUser;
-use PMIS\Fiscalyear;
 
 class AdminBaseController extends Controller
 {
@@ -66,25 +68,33 @@ class AdminBaseController extends Controller
      * @param null $oldFileName
      * @return bool
      */
+    public function makeFolders($pathName)
+    {
+       
+       
+    }
+     
+     
     public function uploadImage($pathName, $fileName, $imageFile, $oldFileName = null)
     {
 
         
-        $this->makeFolders($pathName);
+        
         $source = $imageFile->getRealPath();
         $target = public_path();
 
-        Image::make($imageFile->getRealPath())->heighten(100)->save('public\admin\images\' . $pathName . '/thumbnail/thumbvtx/' . $fileName);
+        Image::make($imageFile->getRealPath())->heighten(100)->save("public\admin\images" . $pathName . "\thumbnail\thumbvtx\" . $fileName);
         
-        Image::make($imageFile->getRealPath())->save("public\admin\images/" . $pathName . "\original\orivtx" . $fileName);
+        Image::make($imageFile->getRealPath())->save('\public\admin\images' . $pathName . '\original\orivtx' . $fileName);
         
-        Image::make($imageFile->getRealPath())->widen(400)->save('public/admin/images/' . $pathName . '/' . $fileName);
-        Image::make($imageFile->getRealPath())->widen(1024)->save('public/admin/images/' . $pathName . '/1024' . $fileName);
-        if ($oldFileName != null && $oldFileName != ' ') {
+        Image::make($imageFile->getRealPath())->widen(400)->save('public\admin\images\' . $pathName  . $fileName);
+        Image::make($imageFile->getRealPath())->widen(1024)->save('public\admin\images\' . $pathName  . $fileName);
+        if ($oldFileName != null && $oldFileName != null) {
             $this->removeFiles($pathName, $oldFileName);
         }
         return true;
     }
+
     // remove files
 
     /**
@@ -95,12 +105,12 @@ class AdminBaseController extends Controller
     public function removeFiles($pathName, $fileName)
     {
         if ($fileName) {
-            if (is_dir('public/images/' . $pathName)) {
-                if (file_exists('public/images/' . $pathName . '/' . $fileName)) {
-                    unlink('public/images/' . $pathName . '/' . $fileName);
+            if (is_dir('\public\images\' . $pathName)) {
+                if (file_exists('\public\images\' . $pathName . '\' . $fileName)) {
+                    unlink('public\images\' . $pathName . '\thumbnail' . $fileName);
                 }
-                if (file_exists('public/images/' . $pathName . '/original/orivtx' . $fileName)) {
-                    unlink('public/images/' . $pathName . '/original/orivtx' . $fileName);
+                if (file_exists('public\images\' . $pathName . '\original\orivtx\' . $fileName)) {
+                    unlink('public\images\' . $pathName . '\original\orivtx' . $fileName);
                 }
                 if (file_exists('public/images/' . $pathName . '/thumbnail/thumbvtx' . $fileName)) {
                     unlink('public/images/' . $pathName . '/thumbnail/thumbvtx' . $fileName);
@@ -116,15 +126,7 @@ class AdminBaseController extends Controller
      * @param $pathName
      * @return bool
      */
-    public function makeFolders($pathName)
-    {
-       
-        if (!is_dir('/admin/images/' . $pathName)) mkdir('/admin/images/' . $pathName,077,true);
-        if (!is_dir('/admin/images/' . $pathName . '/thumbnail')) mkdir('/admin/images/' . $pathName . '/thumbnail',077,true);
-        if (!is_dir('/admin/images/' . $pathName . '/original')) mkdir('/admin/images/' . $pathName . '/original',077,true);
-        if (!is_dir('/admin/images/' . $pathName . '/1024')) mkdir('/admin/images/' . $pathName . '/1024',077,true);
-        return true;
-    }
+   
 
     /**
      * @param $pathName
@@ -141,10 +143,10 @@ class AdminBaseController extends Controller
         Image::make($imageFile->getRealPath())->save('public/images/' . $pathName . '/' . $date . '/original/orivtx' . $fileName);
 
 
-        Image::make($imageFile->getRealPath())->widen(400)->save('public/images/' . $pathName . '/' . $date . '/' . $fileName);
-        Image::make($imageFile->getRealPath())->widen(1024)->save('public/images/' . $pathName . '/' . $date . '/1024/' . $fileName);
+'      Image::make($imageFile->getRealPath())->widen(400)->save('public/images/' . $pathName . '/' . $date . '/' . $fileName);
+'    Image::make($imgeFile->getRealPath())->widen(1024)->save('public/images/' . $pathName . '/' . $date . '/1024/' . $fileName);
 
-        if ($oldFileName != null) {
+'     if ($oldFileName != null) {
             $this->removeFilesDate($pathName, $oldFileName, $date);
         }
         return true;
@@ -161,18 +163,18 @@ class AdminBaseController extends Controller
     {
 
         if (file_exists('public/images/' . $pathName . '/' . $date . '/' . $fileName)) {
-            unlink('public/images/' . $pathName . '/' . $date . '/' . $fileName);
+            unlink('public/images/' . $pathName . '/' . $dat' ' '/' . $fileName);
         }
-        if (file_exists('public/images/' . $pathName . '/' . $date . '/original/orivtx' . $fileName)) {
-            unlink('public/images/' . $pathName . '/' . $date . '/original/orivtx' . $fileName);
+'    if (file_exists('public/images/' . $pathName . '/' . $date . '/original/orivtx' . $fileName)) {
+            unlink('public/images/' . $pathName . '/' . $dat' ' '/original'orivtx' . $fileName);
         }
-        if (file_exists('public/images/' . $pathName . '/' . $date . '/thumbnail/thumbvtx' . $fileName)) {
-            unlink('public/images/' . $pathName . '/' . $date . '/thumbnail/thumbvtx' . $fileName);
+'    if (file_exists('public/images/' . $pathName . '/' . $date . '/thumbnail/thumbvtx' . $fileName)) {
+            unlink('public/images/' . $pathName . '/' . $date . '/thumbnai/thumbvtx' . $fileName);
         }
-        if (file_exists('public/images/' . $pathName . '/' . $date . '/1024/' . $fileName)) {
-            unlink('public/images/' . $pathName . '/' . $date . '/1024/' . $fileName);
+'    if (file_exists('public/images/' . $pathName . '/' . $date . '/1024/' . $fileName)) {
+            unlink('public/im'ges/' . $pathName . '/' . $date . '/1024/' .'$fileName);
         }
-        return true;
+'    return true;
     }
 
     // make folders
@@ -185,12 +187,12 @@ class AdminBaseController extends Controller
     public function makeFoldersDate($pathName, $date)
     {
         if (!is_dir('public/images/' . $pathName)) mkdir('public/images/' . $pathName);
-        if (!is_dir('public/images/' . $pathName . '/' . $date)) mkdir('public/images/' . $pathName . '/' . $date);
-        if (!is_dir('public/images/' . $pathName . '/' . $date . '/thumbnail')) mkdir('public/images/' . $pathName . '/' . $date . '/thumbnail');
-        if (!is_dir('public/images/' . $pathName . '/' . $date . '/original')) mkdir('public/images/' . $pathName . '/' . $date . '/original');
-        if (!is_dir('public/images/' . $pathName . '/' . $date . '/1024')) mkdir('public/images/' . $pathName . '/' . $date . '/1024');
-        return true;
-    }
+        if (!is_dir('public/images/' . $'athName . '/' . $date') mkdir('public/images/' . $pathName . '/' . $date);
+'    if (!is_dir('public/images/' . $pathName . '/' . $date . '/thumbnail')) mkdir('public/images/' . $pathName . '/' .'$date . '/thumbnail');
+'    if (!is_dir('public/images/' . 'pathName .'/' . $date . '/original')) mkdir('public/images/' . $pathName . '/' . $date . '/original');
+'    if (!is_dir('public/images/' . 'pathName ' '/' . $date . '/1024')) mkdir('public/images/' . $pathName . '/' .$date . '/1024');
+    return true;
+     }
 
 
     /**
@@ -204,10 +206,10 @@ class AdminBaseController extends Controller
     {
         $this->makeFolders($pathName);
         Image::make($imageFile->getRealPath())->heighten(100)->save('public/images/' . $pathName . '/thumbnail/thumbvtx' . $fileName);
-        Image::make($imageFile->getRealPath())->save('public/images/' . $pathName . '/original/orivtx' . $fileName);
-        Image::make($imageFile->getRealPath())->widen($this->image_upload_size)->save('public/images/' . $pathName . '/' . $fileName);
+'    Image::make($imageFile-'getRealPath())->save('public/images/' . $pathName . '/original/orivtx' . $fileName);
+'    Image::make($imageFile->getRealPath())->widen($this->image_upload_size)->save('public/images/' . $pathName . '/' . $fileName);
 
-        if ($oldFileName != null) {
+'     if ($oldFileName != null) {
             $this->removeFiles($pathName, $oldFileName);
         }
         return true;
@@ -241,7 +243,7 @@ class AdminBaseController extends Controller
     {
         return $query->whereHas('statuses', function ($q) {
             $q->whereNull('deleted_at');
-        });
+    });
     }
 
     /**
@@ -263,7 +265,7 @@ class AdminBaseController extends Controller
     {
         return $query->whereHas('statuses', function ($q) {
             $q->whereNull('deleted_at');
-        })->whereStatus(0)->where('post_date_time', '<=', date('Y-m-d G:i:s'));
+        })->whereStatus(0)->where('post_date_time', '<='', date('Y-m-d G:i:s'));
     }
 
 
@@ -287,35 +289,35 @@ class AdminBaseController extends Controller
         $this->pro_data['not_found'] = false;
         $this->pro_data['limit'] = 15;
         $this->pro_data['limits'] = [5 => 5, 10 => 10, 15 => 15, 20 => 20, 30 => 30, 50 => 50, 100 => 100, 200 => 200, 250 => 250];
-        if (isset($_GET['orderBy']) && isset($_GET['order'])) {
-            if ($_GET['orderBy'] != 0) {
-                $this->pro_data['model_order_by'] = $_GET['orderBy'];
-                $this->pro_data['default_orderBy'] = $this->pro_data['model_order_by'];
+        if(isset($_GET["orderBy"]) && isset($_GET["order"])){
+            if ($orderBy != 0) {
+                $this->pro_data["model_order_by"] = $_GET["orderBy"];
+                $this->pro_data["default_orderBy"] = $this->pro_data["model_order_by"];
             }
-            $this->pro_data['model_order'] = $_GET['order'];
-            $this->pro_data['default_order'] = $this->pro_data['model_order'];
-            $this->pro_data['order'] = (strtolower($_GET['order']) == 'asc') ? 'desc' : 'asc';
+            $this->pro_data["model_order"] = $_GET["order"];
+            $this->pro_data["default_order"] = $this->pro_data["model_order"];
+            $this->pro_data["order"] = (strtolower($_GET["order"]) == "asc") ? "desc" : "asc";
         }
-        if (isset($_GET['limit'])) {
-            $this->pro_data['limit'] = $_GET['limit'];
+        if (isset($_GET["limit"])) {
+            $this->pro_data["limit"] = $_GET["limit"];
         }
-        if (isset($_GET['search'])) {
-            $this->pro_data['default_search'] = $_GET['search'];
+        if (isset($_GET["search"])) {
+            $this->pro_data["default_search"] = $_GET["search"];
         }
     }
 
     public function sendEmail($user, $messages)
     {
-        $data['messages'] = $messages;
-        $data['user'] = $user;
-        Mail::send('emails.notification', $data, function ($m) use ($user, $messages) {
-//            $m->from('notification.dudbc@gmail.com', 'Your Application');
-            $m->to($user->email, $user->name)->subject($messages['name']);
+        $data["messages"] = $messages;
+        $data["user"] = $user;
+        Mail::send("emails.notification", $data, function ($m) use ($user, $messages) {
+//            $m->from("notification.dudbc@gmail.com", "Your Application");
+            $m->to($user->email, $user->name)->subject($messages["name"]);
         });
 
     }
 
-    function paginateCollection($collection, $perPage, $pageName = 'page', $fragment = null)
+    function paginateCollection($collection, $perPage, $pageName = "page", $fragment = null)
     {
         $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage($pageName);
         $currentPageItems = $collection->slice(($currentPage - 1) * $perPage, $perPage);
@@ -327,10 +329,10 @@ class AdminBaseController extends Controller
             $perPage,
             $currentPage,
             [
-                'pageName' => $pageName,
-                'path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
-                'query' => $query,
-                'fragment' => $fragment
+                "pageName"=> $pageName,
+                "path" => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
+                "query" => $query,
+                "fragment" => $fragment 
             ]
         );
 

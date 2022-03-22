@@ -128,6 +128,7 @@ class ProjectController extends AdminBaseController
 
     public function manageEngineers(Project $project, Request $request)
     {
+        
         foreach ($request->all() as $key=>$value){
             $ids[] = $value;
         }
@@ -137,6 +138,7 @@ class ProjectController extends AdminBaseController
 
         $project->Engineers()->sync($syncManpowers);
         session()->flash('update_success_info', '" Project which named ' . $project->name . ' \'s Project Cordinaors list"');
+        
         return redirect()->back();
     }
 

@@ -1,15 +1,17 @@
 <?php
 namespace PMIS\Http\Controllers\Admin;
 
+use PMIS\User;
+use PMIS\Engineer;
+use PMIS\Manpower;
+use PMIS\Contractor;
 use Illuminate\Http\Request;
+use PMIS\ImplementingOffice;
+use app\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
-use PMIS\Contractor;
-use PMIS\Engineer;
 use PMIS\Http\Controllers\AdminBaseController;
-use PMIS\ImplementingOffice;
-use PMIS\Manpower;
-use PMIS\User;
+
 
 class EngineersController extends AdminBaseController {
     protected $pro_data;
@@ -63,6 +65,7 @@ class EngineersController extends AdminBaseController {
         $this->pro_data['designations'] = Manpower::all()->pluck('title', 'id');
         return view('admin.engineer.create', $this->pro_data);
     }
+    
 
     public function store(Request $request){
         $request->validate([

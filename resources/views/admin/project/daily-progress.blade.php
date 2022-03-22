@@ -112,13 +112,15 @@
                         $selectedUsers = $selectedUsers->pluck('id')->toArray();
                         ?>
 
+                        @php
+                            $currentManpower = $project->dailyprogress->first()->manpower;
+                            $projectChief = $currentManpower['Client']['Project Chief']['id'][0];
+                            //dd($projectChief);
+                        @endphp
                         @if ($manpower === 'Consultant')
                             <div class="input-group pro_make_full showToolTip">
                                 {!! Form::label('lead', 'Team Leader') !!}
-                                @php
-                                    // dd($dailyProgressUsers, $engineer);
-                                @endphp
-                                {!! Form::select('project->engineers[]', $dailyProgressUsers, $engineer->id, ['class' => 'form-control', 'multiple' => 'multiple']) !!}
+                                {!! Form::select('project->engineers[]', $dailyProgressUsers, $projectChief, ['class' => 'form-control', 'multiple' => 'multiple']) !!}
                                 @if ($errors->has('manpower'))
                                     <span class="glyphicon glyphicon-remove-circle form-control-feedback"
                                         aria-hidden="true"></span>
