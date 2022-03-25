@@ -117,8 +117,8 @@
                                             </td>
                                             <td>
                                                 <div class="index_image_thumb">
-                                                    @if ($engineer->image != '' && $engineer->image != null && file_exists('admin/images/engineer/thumbnail/thumbvtx' . $engineer->image))
-                                                        <img src="{{ asset('admin/images/engineer/thumbnail/thumbvtx' . $engineer->image) }}"
+                                                    @if ($engineer->image != '' && $engineer->image != null && file_exists('public/images/engineer/thumbnail/thumbvtx' . $engineer->image))
+                                                        <img src="{{ asset('public/images/engineer/thumbnail/thumbvtx' . $engineer->image) }}"
                                                             alt="{{ $engineer->image }}" title="{{ $engineer->name }}"
                                                             class="img-thumbnail" />
                                                     @else

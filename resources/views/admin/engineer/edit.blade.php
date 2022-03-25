@@ -148,7 +148,7 @@
                     <div class="col-md-4 col-lg-4 pro_content_right" data-appear-animation="fadeInRight" data-appear-delay="1200">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title pull-left"><span class="fa fa-image"></span> Image</h3>
+                                <h3 class="panel-title pull-left"><span class="fa fa-image"></span> Image this</h3>
                                 {!! minimizeButton('pro_collapse_member_image') !!}
                             </div>
                             <div class="panel-body collapse in" id="pro_collapse_member_image">
